@@ -14,7 +14,6 @@ def main_archive(selectType, selectDebugType):
     packageType, netType = terminal_input.parser_select_type(selectType)
     # 切换网络环境alert
     code_update.safe_change_code_config_network(netType)
-    return
     # 解析打包的输出路径
     xcarchivePath = terminal_input.parser_xcarchive_path(packageType, netType)
     # 打包归档
