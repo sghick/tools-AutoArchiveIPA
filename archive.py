@@ -34,12 +34,12 @@ def main_archive(selectType, selectDebugType):
     alert.show_detail_alert(alertTitle, folderPath, showServicesPath)
 
 def archive_ever_input(receiveInput):
-    # # 下载代码
-    # pod_tool.git_clone_repository()
-    # # 更新代码
-    # pod_tool.updateCode()
-    # # 下载Podfile中的代码
-    # pod_tool.installPods()
+    # 下载代码
+    pod_tool.git_clone_repository()
+    # 更新代码
+    pod_tool.updateCode()
+    # 下载Podfile中的代码
+    pod_tool.installPods()
     # 获取输入信息
     for s in receiveInput.split(' '):
         selectType = s
@@ -47,11 +47,11 @@ def archive_ever_input(receiveInput):
         if len(selectType) == 3:
             selectType = s[:1]
             selectDebugType = s[2:]
-        # # 恢复变化
-        # pod_tool.discardAllChange()
-        # # 清理缓存
-        # pod_tool.cleanProject()
-        # 进入打包流程
+        # 恢复变化
+        pod_tool.discardAllChange()
+        # 清理缓存
+        pod_tool.cleanProject()
+        进入打包流程
         main_archive(int(selectType), int(selectDebugType))
 
 if __name__ == '__main__':
