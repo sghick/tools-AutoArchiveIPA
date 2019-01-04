@@ -19,7 +19,7 @@ def safe_change_code_config_network(netType) :
         print("未在config.py中定义代码配置文件!")
 
     
-    if filePath:
+    if not filePath:
         change_code_config_network(netType, filePath)
 
 # 切换代码中配置文件的网络环境配置
