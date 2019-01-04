@@ -51,7 +51,7 @@ def archive_ever_input(receiveInput):
         pod_tool.discardAllChange()
         # 清理缓存
         pod_tool.cleanProject()
-        进入打包流程
+        # 进入打包流程
         main_archive(int(selectType), int(selectDebugType))
 
 if __name__ == '__main__':
