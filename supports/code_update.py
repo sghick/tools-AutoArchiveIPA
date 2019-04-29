@@ -27,7 +27,7 @@ def safe_change_conf_python3(inputs) :
         except:
             print("未在conf_setting.py中找到相关配置!")
         return True
-    return True
+    return False
 
 ####################################################################################################
 # 更改代码配置
