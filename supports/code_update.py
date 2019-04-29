@@ -3,8 +3,31 @@
 from supports import file_option
 from supports import alert
 from conf import config
+import conf_setting
 
 sep_line_str = '+----------------------------+'
+
+####################################################################################################
+# 更改打包配置
+####################################################################################################
+
+def safe_change_conf_python3(inputs) :
+    fmt = inputs[0][0]
+    idx = inputs[0][1:]
+    if (fmt == 'e') :
+        try:
+            name = conf_setting.ConfDocs[int(idx)]
+            filepath1 = config.kScriptRootPath + 'conf/'
+            filepath2 = config.kScriptRootPath + name
+            file_option.removeFolder(filepath1)
+            file_option.copyFolderToFolder(filepath2, filepath1)
+            print("成功切换至: " + name)
+            restarCmd = "python3 %s" % config.kScriptRootPath + 'archive.py'
+            print('请重启脚本: ' + restarCmd)
+        except:
+            print("未在conf_setting.py中找到相关配置!")
+        return True
+    return True
 
 ####################################################################################################
 # 更改代码配置
@@ -18,7 +41,6 @@ def safe_change_code_config_network(netType) :
     except:
         print("未在config.py中定义代码配置文件!")
 
-    
     if filePath:
         change_code_config_network(netType, filePath)
 

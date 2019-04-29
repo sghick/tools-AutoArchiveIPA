@@ -33,6 +33,9 @@ def main_archive(selectType, selectDebugType):
     alert.show_detail_alert(alertTitle, folderPath, showServicesPath)
 
 def archive_ever_input(receiveInput):
+    # 切换打包工程
+    if code_update.safe_change_conf_python3(receiveInput.split(' ')) :
+        return
     # 下载代码
     pod_tool.git_clone_repository()
     # 更新代码
@@ -40,7 +43,7 @@ def archive_ever_input(receiveInput):
     # 下载Podfile中的代码
     pod_tool.installPods()
     # 获取输入信息
-    for s in receiveInput.split(' '):
+    for s in ipts:
         selectType = s
         selectDebugType = -1
         if len(selectType) == 3:

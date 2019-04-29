@@ -60,6 +60,10 @@ def copyFolderToFolder(folderPath1, folderPath2):
     cmd = "cp -R '%s' '%s'" % (folderPath1, folderPath2)
     os.system(cmd)
 
+def removeFolder(folderPath):
+    cmd = "rm -rf '%s'" % folderPath
+    os.system(cmd)
+
 def moveFileToFolder(filePath, folderPath):
     cmd = "mv '%s' '%s'" % (filePath, folderPath)
     os.system(cmd)

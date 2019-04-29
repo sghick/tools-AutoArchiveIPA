@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from conf import config
+import conf_setting
 
 ####################################################################################################
 # 处理输入内容
@@ -11,8 +12,8 @@ sep_line_str = '+----------------------------+'
 # 定义输入内容
 def receive_input() :
     print('\n' + sep_line_str)
-    print('|Branch：' + config.kBranchName)
-    print('|Target：' + config.kTargetName)
+    print('|Branch: ' + config.kBranchName)
+    print('|Target: ' + config.kTargetName)
     print(sep_line_str)
     print('|Dev包内网环境请输: 1')
     print('|Dev包外网环境请输: 2')
@@ -20,7 +21,11 @@ def receive_input() :
     print(sep_line_str)
     print('|打多个包时以空格隔开即可')
     print(sep_line_str)
-    selectTypes = input('请输入：')
+    print('|可切换至以下项目: ')
+    for i in range(len(conf_setting.ConfDocs)) :
+        print('|' + conf_setting.ConfDocs[i] + ' e%d' % i)
+    print(sep_line_str)
+    selectTypes = input('请输入: ')
     print(sep_line_str + '\n')
     return selectTypes
 
