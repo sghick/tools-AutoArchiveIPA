@@ -43,7 +43,7 @@ def archive_ever_input(receiveInput):
     # 下载Podfile中的代码
     pod_tool.installPods()
     # 获取输入信息
-    for s in ipts:
+    for s in receiveInput.split(' '):
         selectType = s
         selectDebugType = -1
         if len(selectType) == 3:
