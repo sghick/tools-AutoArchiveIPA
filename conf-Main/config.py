@@ -28,15 +28,24 @@ kNetStatusForDisCode = '#define APP_RELEASE'
 kNetStatusForDevCode = '//#define APP_RELEASE'
 
 ####################################################################################################
-# 自动派包
+# 自动派包(CMB)
 ####################################################################################################
 
 # 是否将 ipa 包拷贝到服务器
-kCopyIpaToServices = False # True, False
+copy_ipa_to_smb = False # True, False
 # 服务器地址前缀（需要连接一次这个服务器地址，连接成功后在终端中执行 open / 打开根目录，
-kServicesPathPrefix = 'smb://192.107.1.1/Test/'
+# kServicesPathPrefix = 'smb://192.107.1.1/测试/'
+kServicesPathPrefix = '/Users/us/Desktop/SMB/'
 # 查看是否存在kValidPath的路径,有才可以成功拷贝到服务器,此举为了防止误传,完整的服务器地址为 kServicesPathPrefix + kValidPath + v/*.ipa
-kValidPath = 'TestPackage/iOS/'
+kValidPath = '测试安装包/iOS/'
+
+####################################################################################################
+# 自动派包(FIR)
+####################################################################################################
+
+# 是否将 ipa 包上传到FIR
+copy_ipa_to_fir = False # True, False
+fir_token = 'xxxx'
 
 ####################################################################################################
 # 自动发邮件

@@ -87,12 +87,5 @@ def send(subject, content):
     # my.doc = '填写一个文件路径'
     se.send()
 
-def send_success_email(showServicesPath, serviceFileName) :
-    if config.send_email:
-        # 打包成功并拷贝到服务器后发送邮件
-        email_subject = '【打包成功】' + 'iOS ' + serviceFileName + '.ipa'
-        email_content = '安装包地址：' + showServicesPath + serviceFileName + '.ipa'
-        send(email_subject, email_content)
-
 if __name__ == '__main__':
     send(config.email_send_subject, 'test content')

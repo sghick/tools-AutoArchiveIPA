@@ -116,3 +116,9 @@ def getShortVersion(fpath):
 
 def getVersion(fpath):
     return getVersionWithKey('CFBundleVersion', fpath)
+
+def getBundleID(fpath):
+    return getVersionWithKey('CFBundleIdentifier', fpath)
+
+def getApplicationPath(fpath):
+    return getVersionWithKey('ApplicationPath', fpath)

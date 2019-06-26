@@ -25,10 +25,17 @@ def archive(workspaceName, xcarchivePath, targetName) :
         return False
     return True
 
-def exportipa(exportPath, targetName, packageType, netType):
+# 读入info配置
+def readipainfo(exportPath, targetName):
+    infoplistpath = exportPath + targetName + '.xcarchive/Info.plist'
+    iconpath = targetName + '.xcarchive/Products/' + file_option.getApplicationPath(infoplistpath) + '/AppIcon60x60@3x.png'
+    version = file_option.getShortVersion(infoplistpath)
+    build = file_option.getVersion(infoplistpath)
+    bundleid = file_option.getBundleID(infoplistpath)
+    return version, build, bundleid, iconpath
+
+def exportipa(exportPath, targetName, packageType, netType, v):
     curTime = time.strftime("%Y-%m-%d %H-%M-%S", time.localtime())
-    infoplistpath = exportPath + targetName + '.xcarchive' + '/' + 'Info.plist'
-    v = file_option.getVersion(infoplistpath)
     folderName = '%s %s' % (targetName, curTime)
     folderPath = '%s%s/%s/' % (exportPath, v, folderName)
     file_option.createFolderIfNeed(folderPath)
@@ -81,7 +88,7 @@ def exportdSYMFile(exprotFileName, folderPath, targetName):
     print('dSYM out put:' + dSYMToOutputPath)
     file_option.copyFolderToFolder(dSYMPath, dSYMToOutputPath)
 
-def uploadService(netType, packageType, exprotFileName, folderPath) : 
+def uploadService(netType, packageType, exprotFileName, folderPath, v) : 
     toValidPath = config.kServicesPathPrefix + config.kValidPath
     # 验证安全路径是否存在,如果存在,则创建目标路径,否则判断上传失败
     if not os.path.exists(toValidPath):
@@ -100,10 +107,6 @@ def uploadService(netType, packageType, exprotFileName, folderPath) :
         sfn = 'AppStore'
     else:
         sfn = nn
-    # 版本号,从dSYM文件中获取
-    dSYMFilePath = folderPath + exprotFileName + '.dSYM'
-    infoplistpath = dSYMFilePath + '/Contents/Info.plist'
-    v = file_option.getVersion(infoplistpath)
     # 生成服务器存放ipa包的路径
     servicesPath = toValidPath + v[0:len(v) - len(v.split('.')[-1]) - 1] + '/' + sfn + '/'
     ipaIdx = 1
@@ -131,7 +134,7 @@ def uploadService(netType, packageType, exprotFileName, folderPath) :
     file_option.fileRename(ipaPath, newIpaPath)
     ipaPath = newIpaPath
     ipaToServicesPath = servicesPath + name + '.ipa'
-    if config.kCopyIpaToServices:
+    if config.copy_ipa_to_smb:
         # 拷贝ipa包到服务器
         file_option.copyFileToFolder(ipaPath, ipaToServicesPath)
 
