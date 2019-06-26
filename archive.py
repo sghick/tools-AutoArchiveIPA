@@ -39,6 +39,7 @@ def main_archive(selectType, selectDebugType):
     # 拷贝到服务器
     localpath = folderPath + exprotFileName + '.ipa'
     status = '本地地址:' + localpath
+    showServicesPath = ''
     if config.copy_ipa_to_smb :
         print_split.print_log('7.拷贝到服务器')
         showServicesPath, serviceFileName, alertTitle = xc_tool.uploadService(packageType, netType, exprotFileName, folderPath, build)
@@ -57,8 +58,8 @@ def main_archive(selectType, selectDebugType):
         send_email.send(email_subject , email_content)
     # 结果弹窗
     print_split.print_log('10.结束')
-    alert.show_detail_alert(alertTitle, folderPath, showServicesPath)
-
+    alert.show_detail_alert("自动打包结束", folderPath, showServicesPath)
+    
 def archive_ever_input(receiveInput):
     # 切换打包工程
     if code_update.safe_change_conf_python3(receiveInput.split(' ')) :
