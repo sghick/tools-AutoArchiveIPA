@@ -20,6 +20,7 @@ def receive_input() :
     print('|AppStore包请输:    3')
     print(sep_line_str)
     print('|打多个包时以空格隔开即可')
+    print('|如需自动上传至fir,请在每个数字后加 -a')
     print(sep_line_str)
     print('|可切换至以下项目: ')
     for i in range(len(conf_setting.ConfDocs)) :

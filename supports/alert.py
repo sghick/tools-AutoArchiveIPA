@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import sys
 import os
 import tkinter
 import threading
@@ -107,4 +108,14 @@ def show_detail_alert(title, archiveFolder, servicesFolder, autoclose=False):
 if __name__ == '__main__':
     # show_alert('测试自动关闭', autoclose=True)
     # show_alert('拷贝 dSYM 文件到服务器失败！', autoclose=False)
-    show_detail_alert(title='打包成功！', archiveFolder='/Users/us/Desktop/', servicesFolder='smb://10.11.102.111/xxxx/测试/测试安装包')
+    # show_detail_alert(title='打包成功！', archiveFolder='/Users/us/Desktop/', servicesFolder='smb://10.11.102.111/xxxx/测试/测试安装包')
+    title = ''
+    archiveFolder = ''
+    servicesFolder = ''
+    if len(sys.argv) >= 1:
+        title = sys.argv[1]
+    if len(sys.argv) >= 2:
+        archiveFolder = sys.argv[2]
+    if len(sys.argv) >= 3:
+        servicesFolder = sys.argv[3]
+    show_detail_alert(title, archiveFolder, servicesFolder, True)

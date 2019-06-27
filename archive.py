@@ -59,7 +59,7 @@ def main_archive(selectType, cmdType):
         send_email.send(email_subject , email_content)
     # 结果弹窗
     print_split.print_log('10.结束')
-    alert.show_detail_alert("自动打包结束", folderPath, showServicesPath)
+    alert.show_detail_alert("自动打包结束", folderPath, showServicesPath, True)
 
 def archive_ever_input(receiveInput):
     # 切换打包工程
