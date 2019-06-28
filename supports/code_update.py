@@ -11,10 +11,10 @@ sep_line_str = '+----------------------------+'
 ####################################################################################################
 
 def safe_change_conf_python3(inputs, confDocs) :
-    fmt = inputs[0][0]
-    idx = inputs[0][1:]
+    fmt = inputs[0][:2]
+    idx = inputs[0][2:]
 
-    if (fmt == 'e') :
+    if (fmt == '-e') :
         try:
             if len(idx)==0 :
                 print("参数错误!")
@@ -31,6 +31,8 @@ def safe_change_conf_python3(inputs, confDocs) :
     return True
 
 def change_conf_python3(idx, lenconfig):
+    if int(idx) >= lenconfig:
+        return
     fpath = settings.kAutoArchiveConifgRootPath + 'config.py'
     markcode = 'CurrentConfigIndex = '
     # 获取代码配置文件内容
@@ -46,7 +48,6 @@ def change_conf_python3(idx, lenconfig):
             codeline = line
             break
     if not codeline:
-        print('未找到配置!')
         return
     text = text.replace(codeline, markcode + idx)
 

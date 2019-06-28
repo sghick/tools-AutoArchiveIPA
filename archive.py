@@ -114,7 +114,14 @@ def main_archive(selectType, cmdType):
 def valid_inputs(rinpts):
     if len(rinpts)==0:
         return False
-        
+    # 带'-'的命令可以通过
+    if rinpts[0][:1]=='-':
+        try:
+            rinpts[0][1:2]=='e'
+            return True
+        except:
+            return False
+
     for s in rinpts:
         selectType = s
         if len(selectType) >= 3:
@@ -129,7 +136,7 @@ def valid_inputs(rinpts):
 def archive_ever_input(rinpts):
     # 参数校验
     if valid_inputs(rinpts)==False :
-        print_split.print_war('参数错误' + inputs) 
+        print_split.print_war('参数错误~') 
         return 
     # 切换打包工程
     if code_update.safe_change_conf_python3(rinpts, config.ConfDocs())==False :

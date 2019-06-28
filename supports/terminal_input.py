@@ -23,7 +23,7 @@ def receive_input(branch, target, confDocs) :
     print(sep_line_str)
     print('|可切换至以下项目: ')
     for i in range(len(confDocs)) :
-        print('|' + confDocs[i] + ' e%d' % i)
+        print('|' + confDocs[i] + ' -e%d' % i)
     print(sep_line_str)
     selectTypes = input('请输入: ')
     print(sep_line_str + '\n')
