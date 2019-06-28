@@ -1,7 +1,6 @@
 # coding: utf-8
 
 import os
-from conf import config
 
 ####################################################################################################
 # 文件操作的定义
@@ -104,7 +103,7 @@ def getVersionWithKey(key, fpath):
                     flage = True
         return v
     except Exception as e:
-        print('读取 %s 文件出错！', config.kInfoPlistPath)
+        print('读取 %s 文件出错！', fpath)
         print(e)
     finally:
         # 关闭文件

@@ -8,31 +8,17 @@ import requests
 import json
 import os
 import sys
-from conf import config
-
-split = '-' * 20
-
-def print_split(s):
-    print(split + '[ ' + s + ' ]' + split)
-
-
-# 必填项，可以通过命令行参数传入
-
-# fir 的token 和包信息
-APP_INFO = {
-    'api_token': 'xxx',
-    'bundle_id': 'bundleID'
-}
+from utils import print_split
 
 # 获取 fir 的上传凭证
-def get_cert():
-    print_split('发起获取上传凭证请求')
-    data = {'type': 'ios', 'bundle_id': APP_INFO['bundle_id'],
-            'api_token': APP_INFO['api_token']}
+def get_cert(bundle_id, api_token):
+    print_split.print_log('发起获取上传凭证请求')
+    data = {'type': 'ios', 'bundle_id': bundle_id,
+            'api_token': api_token}
     print(data)
     req = requests.post(url='http://api.fir.im/apps', data=data)
     cert_resp = req.content
-    print_split('获取到 fir 响应')
+    print_split.print_log('获取到 fir 响应')
     print(str(cert_resp))
     return cert_resp
 
@@ -43,7 +29,7 @@ def upload_icon(icon, path):
     cert_token = icon['token']
     cert_upload_url = icon['upload_url']
 
-    print_split('上传 icon')
+    print_split.print_log('上传 icon')
     file = {'file': open(path, 'rb')}
     param = {
         "key": cert_key,
@@ -61,7 +47,7 @@ def upload_fir(binary, path, version, build, changelog):
     cert_token = binary['token']
     cert_upload_url = binary['upload_url']
 
-    print_split('上传 iPA')
+    print_split.print_log('上传 iPA')
     file = {'file': open(path, 'rb')}
     param = {
         "key": cert_key,
@@ -75,19 +61,20 @@ def upload_fir(binary, path, version, build, changelog):
     print(req.content)
     return req.content
 
-def upload_ipa(ipa_path, iconpath, bundle_id, netType, version, build):
-    APP_INFO['api_token'] = config.fir_token
-    APP_INFO['bundle_id'] = bundle_id
+def upload_ipa(fir_token, ipa_path, iconpath, bundle_id, netType, version, build):
     changelog = ''
     if netType == 1:
-        changelog = '[测试环境](自动上传)'
+        changelog = '[测试环境](脚本自动上传,请添加更新说明)'
     else:
-        changelog = '[线上环境](自动上传)'
+        changelog = '[线上环境](脚本自动上传,请添加更新说明)'
 
-    cert_resp2 = get_cert()
+    cert_resp2 = get_cert(bundle_id, fir_token)
     # 拿到cert实体
     cert_json = json.loads(cert_resp2)
     binary_dirt = cert_json['cert']['binary']
     icon_dirt = cert_json['cert']['icon']
+    downloadurl = 'https://fir.im/' + cert_json['short']
+    operalurl = 'https://fir.im/apps/' + cert_json['id']
     upload_icon(icon_dirt, iconpath)
-    return upload_fir(binary_dirt, ipa_path, version, build, changelog)
+    upload_fir(binary_dirt, ipa_path, version, build, changelog)
+    return downloadurl, operalurl

@@ -4,7 +4,6 @@ import smtplib
 import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from conf import config
 
 ####################################################################################################
 # 邮件操作
@@ -12,6 +11,8 @@ from conf import config
 
 class SendEmail:
     def __init__(self):
+        self.SMTP = None
+        self.port = None
         self.user = None
         self.passwd = None
         self.sender_name = None
@@ -27,7 +28,7 @@ class SendEmail:
         '''
         print('邮件发送中...')
         try:
-            server = smtplib.SMTP_SSL(config.email_SMTP, port=config.email_SMTP_port)
+            server = smtplib.SMTP_SSL(self.SMTP, port=self.port)
             server.login(self.user, self.passwd)
             server.sendmail("<%s>" % self.user, self.to_list + self.cc_list, self.get_attach())
             server.close()
@@ -69,16 +70,19 @@ class SendEmail:
             f.close()
         return attach.as_string()
 
-def send(subject, content):
+def email_create(SMTP, port, user, password):
     se = SendEmail()
+    se.SMTP = SMTP
+    se.port = port
+    se.user = user
+    se.passwd = password
+    return se
 
-    se.user = config.email_user
-    se.passwd = config.email_password
-
-    se.sender_name = config.email_sender_name
-    se.to_list = config.email_to_list
-    if config.email_cc_list:
-        se.cc_list = config.email_cc_list
+def send(se, sendername, to_list, cc_list, subject, content):
+    se.sender_name = sendername
+    se.to_list = to_list
+    if cc_list:
+        se.cc_list = cc_list
     # 主题
     se.subject = subject
     # 内容
@@ -88,4 +92,5 @@ def send(subject, content):
     se.send()
 
 if __name__ == '__main__':
-    send(config.email_send_subject, 'test content')
+    se = email_create("smtp", "port", "user", "password")
+    send(se, "sendername", "to_list", "cc_list", "subject", 'content')

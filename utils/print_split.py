@@ -10,13 +10,13 @@ def print_war(s):
     print('||:' + s)
 
 def print_log(s):
-    print(split + '[ ' + s + ' ]' + split)
+    print(get_log(s))
 
 def print_head():
     print('\n+' + split + '+')
 
 def print_sep():
-    print('+' + split + '+')
+    print(get_sep())
 
 def print_foot():
     print('+' + split + '+\n')
@@ -24,3 +24,8 @@ def print_foot():
 def print_body(s):
     print('|' + s)
 
+def get_log(s):
+    return split + '[ ' + s + ' ]' + split
+
+def get_sep():
+    return '+' + split + '+'

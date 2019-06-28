@@ -4,87 +4,159 @@ from supports import terminal_input
 from supports import code_update
 from supports import xc_tool
 from supports import pod_tool
-from supports import send_email
-from supports import alert
-from supports import print_split
-from supports import fir_upload
+from supports import auto_smb
+from supports import auto_itc
+from supports import auto_fir
+from supports import auto_email
+from utils import alert
+from utils import print_split
 from conf import config
 
 def main_archive(selectType, cmdType):
+    # config values
+    config_ExportOnly = config.ExportOnly
+
+    config_kRepositoryGit = config.kRepositoryGit()
+    config_kRepositoryName = config.kRepositoryName()
+    config_kBranchName = config.kBranchName()
+    config_kWorkspaceName = config.kWorkspaceName()
+    config_kTargetName = config.kTargetName()
+    
+    config_kConfigFilePath = config.kConfigFilePath()
+    config_kNetStatusForDisCode = config.kNetStatusForDisCode()
+    config_kNetStatusForDevCode = config.kNetStatusForDevCode()
+    
+    config_copy_ipa_to_smb = config.copy_ipa_to_smb()
+    config_services_path_prefix = config.services_path_prefix()
+    config_configvalid_path = config.valid_path()
+    config_copy_ipa_to_itc = config.copy_ipa_to_itc()
+    config_itc_username = config.itc_username()
+    config_itc_password = config.itc_password()
+    config_copy_ipa_to_fir = config.copy_ipa_to_fir()
+    config_fir_token = config.fir_token()
+    config_send_email = config.send_email()
+    config_email_SMTP = config.email_SMTP()
+    config_email_SMTP_port = config.email_SMTP_port()
+    config_email_user = config.email_user()
+    config_email_password = config.email_password()
+    config_email_sender_name = config.email_sender_name()
+    config_email_to_list = config.email_to_list()
+    config_email_cc_list = config.email_cc_list()
+
     # cmdType: -a:自动上传fir
     # 解析配置类型
     print_split.print_log('1.解析配置类型')
     packageType, netType = terminal_input.parser_select_type(selectType)
     # 切换网络环境
     print_split.print_log('2.切换网络环境')
-    code_update.safe_change_code_config_network(netType)
+    code_update.safe_change_code_config_network(netType, config_kConfigFilePath, config_kNetStatusForDevCode, config_kNetStatusForDisCode)
     # 解析打包的输出路径
     print_split.print_log('3.解析打包的输出路径')
-    xcarchivePath = terminal_input.parser_xcarchive_path(packageType, netType)
+    xcarchivePath = terminal_input.parser_xcarchive_path(config_kRepositoryName, packageType, netType)
     # 打包归档
-    print_split.print_log('4.打包归档')
-    archiveSuccess = xc_tool.archive(config.kWorkspaceName, xcarchivePath, config.kTargetName)
-    # 如果打包失败,终止之后的操作
-    if not archiveSuccess:
-        print_split.print_war('打包失败')
-        return
+    if config.ExportOnly==False:
+        print_split.print_log('4.打包归档')
+        archiveSuccess = xc_tool.archive(config_kRepositoryName, config_kWorkspaceName, xcarchivePath, config_kTargetName)
+        # 如果打包失败,终止之后的操作
+        if not archiveSuccess:
+            print_split.print_war('打包失败')
+            return
     # 读入info配置
-    version, build, bundleid, iconpath = xc_tool.readipainfo(xcarchivePath, config.kTargetName)
+    version, build, bundleid, iconpath = xc_tool.readipainfo(xcarchivePath, config_kTargetName)
     # 导出ipa文件,返回ipa文件名(不带扩展名)
     print_split.print_log('5.导出ipa文件')
-    exprotFileName, folderPath = xc_tool.exportipa(xcarchivePath, config.kTargetName, packageType, netType, build)
+    exprotFileName, folderPath = xc_tool.exportipa(config_kRepositoryName, xcarchivePath, config_kTargetName, packageType, netType, build)
     # 导出dSYM文件
     print_split.print_log('6.导出dSYM文件')
-    xc_tool.exportdSYMFile(exprotFileName, folderPath, config.kTargetName)
-    # 拷贝到服务器
+    xc_tool.exportdSYMFile(exprotFileName, folderPath, config_kTargetName)
+    # 备份
     localpath = folderPath + exprotFileName + '.ipa'
-    status = '本地地址:' + localpath
-    showServicesPath = ''
-    if config.copy_ipa_to_smb :
-        print_split.print_log('7.拷贝到服务器')
-        showServicesPath, serviceFileName, alertTitle = xc_tool.uploadService(packageType, netType, exprotFileName, folderPath, build)
-        status = status + '\n' + alertTitle
-    # 拷贝到FIR
-    if config.copy_ipa_to_fir :
-        if cmdType == 'a':
-            print_split.print_log('8.上传到FIR')
-            fir_upload.upload_ipa(folderPath + exprotFileName + '.ipa', folderPath + iconpath, bundleid, netType, version, build)
-            status = status + '\n' + "上传FIR成功,请扫码下载"
-    # 发邮件
-    if config.send_email :
-        print_split.print_log('9.发邮件')
-        # 打包成功并拷贝到服务器后发送邮件
-        email_subject = '【打包成功】' + 'iOS ' + config.kTargetName + " " + build
-        email_content = status  
-        send_email.send(email_subject , email_content)
-    # 结果弹窗
-    print_split.print_log('10.结束')
-    alert.show_detail_alert("自动打包结束", folderPath, showServicesPath, True)
+    status = print_split.get_log('打包成功')
+    status = status + '\n' + '本地地址:\n  ' + localpath
 
-def archive_ever_input(receiveInput):
+    showServicesPath = ''
+    if config_copy_ipa_to_smb :
+        print_split.print_log('7.备份到SMB')
+        showServicesPath, serviceFileName, alertTitle = auto_smb.uploadipa(config_services_path_prefix, config_valid_path, packageType, netType, exprotFileName, folderPath, build)
+        status = status + '\n' + alertTitle
+    # 自动上传/派包
+    if cmdType == 'a':
+        # 上传到ITC
+        if selectType == 3:
+            if config_copy_ipa_to_itc :
+                print_split.print_log('8.上传到ITC(appstore类型专属)')
+                auto_itc.uploaditc(localpath, config_itc_username, config_itc_password)
+                status = status + '\n' + print_split.get_log('上传ITC成功')
+                status = status + '\n' + '请添加testflight进行测试'
+        # 上传到FIR
+        else:
+            if config_copy_ipa_to_fir :
+                print_split.print_log('9.上传到FIR')
+                downloadurl, operalurl = auto_fir.upload_ipa(config_fir_token, localpath, folderPath + iconpath, bundleid, netType, version, build)
+                status = status + '\n' + print_split.get_log('上传FIR成功')
+                status = status + '\n' + '请扫码下载:'
+                status = status + '\n' + '操作地址:\n  ' + operalurl
+                status = status + '\n' + '下载地址:\n  ' + downloadurl
+    # 结果
+    if config_send_email :
+        # 发邮件
+        print_split.print_log('10.发邮件')
+        # 打包成功并拷贝到服务器后发送邮件
+        se = auto_email.email_create(config_email_SMTP, config_email_SMTP_port, config_email_user, config_email_password)
+        email_subject = '【打包成功】' + 'iOS ' + config_kTargetName + ' ' + build + ' ' + terminal_input.parser_net_name(selectType)
+        email_content = status  
+        auto_email.send(se, config_email_sender_name, config_email_to_list, config_email_cc_list, email_subject, email_content)
+    else:
+        # 结果弹窗
+        print_split.print_log('11.结束')
+        alert.show_detail_alert('自动打包结束', folderPath, showServicesPath, True)
+
+def valid_inputs(rinpts):
+    if len(rinpts)==0:
+        return False
+        
+    for s in rinpts:
+        selectType = s
+        if len(selectType) >= 3:
+            selectType = s[:1]
+        try:
+            if int(selectType) > 3:
+                return False
+        except:
+            return False
+    return True
+
+def archive_ever_input(rinpts):
+    # 参数校验
+    if valid_inputs(rinpts)==False :
+        print_split.print_war('参数错误' + inputs) 
+        return 
     # 切换打包工程
-    if code_update.safe_change_conf_python3(receiveInput.split(' ')) :
+    if code_update.safe_change_conf_python3(rinpts, config.ConfDocs())==False :
         return
-    # 下载代码
-    pod_tool.git_clone_repository()
-    # 更新代码
-    pod_tool.updateCode()
-    # 下载Podfile中的代码
-    pod_tool.installPods()
+    if config.ExportOnly==False:
+        # 下载代码
+        pod_tool.git_clone_repository(config.kRepositoryGit())
+        # 更新代码
+        pod_tool.updateCode(config.kRepositoryName(), config.kBranchName())
+        # 下载Podfile中的代码
+        pod_tool.installPods(config.kRepositoryName())
     # 获取输入信息
-    for s in receiveInput.split(' '):
+    for s in rinpts:
         selectType = s
         cmdType = ''
         if len(selectType) >= 3:
             selectType = s[:1]
             cmdType = s[2:]
-        # 恢复变化
-        pod_tool.discardAllChange()
-        # 清理缓存
-        pod_tool.cleanProject()
+        if config.ExportOnly==False:
+            # 恢复变化
+            pod_tool.discardAllChange(config.kRepositoryName())
+            # 清理缓存
+            pod_tool.cleanProject(config.kRepositoryName(), config.kTargetName())
         # 进入打包流程
         main_archive(int(selectType), cmdType)
 
 if __name__ == '__main__':
-    receiveInput = terminal_input.receive_input()
-    archive_ever_input(receiveInput)
+    receiveInput = terminal_input.receive_input(config.kBranchName(), config.kTargetName(), config.ConfDocs())
+    rinpts = receiveInput.split(' ')
+    archive_ever_input(rinpts)
