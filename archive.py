@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import sys
 from supports import terminal_input
 from supports import code_update
 from supports import xc_tool
@@ -86,8 +87,8 @@ def main_archive(selectType, cmdType):
             if config_copy_ipa_to_itc :
                 print_split.print_log('8.上传到ITC(appstore类型专属)')
                 auto_itc.uploaditc(localpath, config_itc_username, config_itc_password)
-                status = status + '\n' + print_split.get_log('上传ITC成功')
-                status = status + '\n' + '请添加testflight进行测试'
+                status = status + '\n' + print_split.get_log('已经上传至ITC')
+                status = status + '\n' + '是否上传成功,请以苹果邮件和具体情况为准,成功后可进行testflight测试'
         # 上传到FIR
         else:
             if config_copy_ipa_to_fir :
@@ -110,6 +111,11 @@ def main_archive(selectType, cmdType):
         # 结果弹窗
         print_split.print_log('11.结束')
         alert.show_detail_alert('自动打包结束', folderPath, showServicesPath, True)
+
+def begin_tip(rinputs):
+    print_split.print_log('即将开始打包')
+    print_split.print_war('当前项目名:' + config.kTargetName())
+    print_split.print_war('当前分支:' + config.kBranchName())
 
 def valid_inputs(rinpts):
     if len(rinpts)==0:
@@ -141,6 +147,9 @@ def archive_ever_input(rinpts):
     # 切换打包工程
     if code_update.safe_change_conf_python3(rinpts, config.ConfDocs())==False :
         return
+    # 即将打包提示
+    begin_tip(rinpts)
+    # 非调试模式时
     if config.ExportOnly==False:
         # 下载代码
         pod_tool.git_clone_repository(config.kRepositoryGit())
@@ -164,6 +173,13 @@ def archive_ever_input(rinpts):
         main_archive(int(selectType), cmdType)
 
 if __name__ == '__main__':
-    receiveInput = terminal_input.receive_input(config.kBranchName(), config.kTargetName(), config.ConfDocs())
-    rinpts = receiveInput.split(' ')
-    archive_ever_input(rinpts)
+    args = sys.argv
+    if len(args) < 2:
+        receiveInput = terminal_input.receive_input(config.kBranchName(), config.kTargetName(), config.ConfDocs())
+        rinpts = receiveInput.split(' ')
+        print(rinpts[0])
+        archive_ever_input(rinpts)
+    else:
+        rinpts = args[1:len(args)]
+        print(rinpts[0])
+        archive_ever_input(rinpts)
