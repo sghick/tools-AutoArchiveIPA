@@ -4,7 +4,7 @@
 # fir upload
 ####################################################################################################
 
-import requests
+from urllib import parse,request
 import json
 import os
 import sys
@@ -16,7 +16,7 @@ def get_cert(bundle_id, api_token):
     data = {'type': 'ios', 'bundle_id': bundle_id,
             'api_token': api_token}
     print(data)
-    req = requests.post(url='http://api.fir.im/apps', data=data)
+    req = request.post(url='http://api.fir.im/apps', data=data)
     cert_resp = req.content
     print_split.print_log('获取到 fir 响应')
     print(str(cert_resp))
@@ -35,8 +35,8 @@ def upload_icon(icon, path):
         "key": cert_key,
         "token": cert_token
     }
-    requests.packages.urllib3.disable_warnings()
-    req = requests.post(cert_upload_url,files=file, data=param, verify=False)
+    request.packages.urllib3.disable_warnings()
+    req = request.post(cert_upload_url,files=file, data=param, verify=False)
     print(req.content)
     return req.content
 
@@ -56,8 +56,8 @@ def upload_fir(binary, path, version, build, changelog):
         "x:build": build,
         "x:changelog": changelog
     }
-    requests.packages.urllib3.disable_warnings()
-    req = requests.post(cert_upload_url,files=file, data=param, verify=False)
+    request.packages.urllib3.disable_warnings()
+    req = request.post(cert_upload_url,files=file, data=param, verify=False)
     print(req.content)
     return req.content
 

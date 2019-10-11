@@ -99,7 +99,7 @@ def main_archive(selectType, cmdType):
                 status = status + '\n' + '操作地址:\n  ' + operalurl
                 status = status + '\n' + '下载地址:\n  ' + downloadurl
     # 结果
-    if config_send_email :
+    if config_send_email and (selectType == 3) :
         # 发邮件
         print_split.print_log('10.发邮件')
         # 打包成功并拷贝到服务器后发送邮件
