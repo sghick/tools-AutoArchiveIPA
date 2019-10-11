@@ -67,6 +67,7 @@ ConfigInfo_General = {
     'email_password': 'xxx',
     'email_sender_name': 'iOS Team',
     'email_to_list': ['a001@bbb.com', 'a002@bbb.com'],
+    'email_to_list_itc': ['a001@bbb.com'], # ITC上传时可以进行区别配置
     'email_cc_list': None,
 }
 
@@ -146,6 +147,8 @@ def email_sender_name():
     return ConfigInfo_General['email_sender_name']
 def email_to_list():
     return ConfigInfo_General['email_to_list']
+def email_to_list_itc():
+    return ConfigInfo_General['email_to_list_itc']
 def email_cc_list():
     return ConfigInfo_General['email_cc_list']
 

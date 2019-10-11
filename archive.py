@@ -42,6 +42,7 @@ def main_archive(selectType, cmdType):
     config_email_password = config.email_password()
     config_email_sender_name = config.email_sender_name()
     config_email_to_list = config.email_to_list()
+    config_email_to_list_itc = config.email_to_list_itc()
     config_email_cc_list = config.email_cc_list()
 
     # cmdType: -a:自动上传fir
@@ -99,14 +100,15 @@ def main_archive(selectType, cmdType):
                 status = status + '\n' + '操作地址:\n  ' + operalurl
                 status = status + '\n' + '下载地址:\n  ' + downloadurl
     # 结果
-    if config_send_email and (selectType != 3) :
+    if config_send_email :
+        email_to_list = config_email_to_list if selectType != 3 else config_email_to_list_itc
         # 发邮件
         print_split.print_log('10.发邮件')
         # 打包成功并拷贝到服务器后发送邮件
         se = auto_email.email_create(config_email_SMTP, config_email_SMTP_port, config_email_user, config_email_password)
         email_subject = '【打包成功】' + 'iOS ' + config_kTargetName + ' ' + build + ' ' + terminal_input.parser_net_name(selectType)
         email_content = status  
-        auto_email.send(se, config_email_sender_name, config_email_to_list, config_email_cc_list, email_subject, email_content)
+        auto_email.send(se, config_email_sender_name, email_to_list, config_email_cc_list, email_subject, email_content)
     else:
         # 结果弹窗
         print_split.print_log('11.结束')
