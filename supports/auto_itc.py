@@ -10,16 +10,16 @@ from utils import settings
 
 def validateipa(filepath, username, password):
     print_split.print_war('ITC验证app:')
-    toolcmd = '/Applications/Xcode.app/Contents/Applications/Application\ Loader.app/Contents/Frameworks/ITunesSoftwareService.framework/Versions/A/Support/altool'
-    command = "%s --validate-app -f '%s' -u '%s' -p '%s'" % (toolcmd, filepath, username, password)
+    toolcmd = 'xcrun altool'
+    command = "%s --validate-app -f '%s' -t ios -p '%s' -u '%s'" % (toolcmd, filepath, password, username)
     print('altoolValidateCommand：' + command)
     os.system(command)
     return
 
 def uploadipa(filepath, username, password):
     print_split.print_war('ITC上传app:')
-    toolcmd = '/Applications/Xcode.app/Contents/Applications/Application\ Loader.app/Contents/Frameworks/ITunesSoftwareService.framework/Versions/A/Support/altool'
-    command = "%s --upload-app -f '%s' -u '%s' -p '%s'" % (toolcmd, filepath, username, password)
+    toolcmd = 'xcrun altool'
+    command = "%s --upload-app -f '%s' -t ios -p '%s' -u '%s'" % (toolcmd, filepath, password, username)
     print('altoolUploadCommand：' + command)
     os.system(command)
     return
