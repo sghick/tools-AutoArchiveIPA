@@ -131,3 +131,74 @@ def change_code_config_network(netType, fpath, netStatusForDevCode, netStatusFor
         return False
     else :
         return True
+
+def safe_change_podfile_debugmark(selectType, configFilePath, podfileForDebugmode, podfileForReleasemode) :
+    filePath = None
+    try:
+        filePath = settings.kAutoArchiveRepositoryRootPath + configFilePath
+        print(filePath)
+    except:
+        print("未定义代码配置文件!")
+
+    if filePath:
+        change_podfile_debugmark(selectType, filePath, podfileForDebugmode, podfileForReleasemode)
+
+# 切换代码中Podefile文件中的DebugMode配置
+# selectType:  1,2:debugmode 3:releasemode 
+# fpath:    代码的配置文件路径
+def change_podfile_debugmark(selectType, fpath, podfileForDebugmode, podfileForReleasemode) :
+    # 0:release 1:debug
+    podDebugmode = 0
+    if selectType < 3:
+        podDebugmode = 1
+    # 获取代码配置文件内容
+    text, fileReadErrorReason = file_option.read_file(fpath)
+    # 检查操作代码配置文件是否失败
+    if text is None:
+        alert.show_alert(fileReadErrorReason)
+        return False
+
+    print('\n\n' + sep_line_str)
+    # 代码里设置
+    codeDebugmode = None
+    # 代码里设置的网络环境的那一行内容
+    codeNetLine = None
+    tl = text.split('\n')
+    for line in tl:
+        if podfileForDebugmode==line:
+            codeDebugmode = 1
+            codeNetLine = line
+            break
+        elif podfileForReleasemode==line:
+            codeDebugmode = 0
+            codeNetLine = line
+            break
+
+    if not codeNetLine:
+        print('未找到PodDebug设置相关')
+        print(sep_line_str + '\n\n')
+        return
+
+    if podDebugmode == 0:
+        if codeDebugmode == 0:
+            print('当前PodDebugMode：OFF')
+        else:
+            print('当前PodDebugMode：ON')
+            text = text.replace(codeNetLine, podfileForReleasemode)
+            print('已经PodDebugMode改为了 OFF')
+    elif podDebugmode == 1:
+        if codeDebugmode == 0:
+            print('当前PodDebugMode：OFF')
+            text = text.replace(codeNetLine, podfileForDebugmode)
+            print('已经PodDebugMode改为了 ON')
+        else:
+            print('当前PodDebugMode：ON')
+    print(sep_line_str + '\n\n')
+    # 写入代码配置文件内容
+    fileWriteErrorReason = file_option.write_file(fpath, text)
+    # 检查操作失败,弹窗提示
+    if fileWriteErrorReason is not None :
+        alert.show_alert(fileWriteErrorReason)
+        return False
+    else :
+        return True

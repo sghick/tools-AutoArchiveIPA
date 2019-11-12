@@ -22,6 +22,10 @@ def main_archive(selectType, cmdType):
     config_kBranchName = config.kBranchName()
     config_kWorkspaceName = config.kWorkspaceName()
     config_kTargetName = config.kTargetName()
+
+    config_kPodFilePath = config.kPodFilePath()
+    config_kPodfileForDebugmode = config.kPodfileForDebugmode()
+    config_kPodfileForReleasemode = config.kPodfileForReleasemode()
     
     config_kConfigFilePath = config.kConfigFilePath()
     config_kNetStatusForDisCode = config.kNetStatusForDisCode()
@@ -49,6 +53,24 @@ def main_archive(selectType, cmdType):
     # 解析配置类型
     print_split.print_log('1.解析配置类型')
     packageType, netType = terminal_input.parser_select_type(selectType)
+
+    # 非调试模式时
+    if config.ExportOnly==False:
+        # 下载代码
+        pod_tool.git_clone_repository(config.kRepositoryGit())
+        # 更新代码
+        pod_tool.updateCode(config.kRepositoryName(), config.kBranchName())
+        # 校验podfile的debugmode
+        code_update.safe_change_podfile_debugmark(selectType, config_kPodFilePath, config_kPodfileForDebugmode, config_kPodfileForReleasemode)
+        # 下载Podfile中的代码
+        pod_tool.installPods(config.kRepositoryName())
+
+    if config.ExportOnly==False:
+        # 恢复变化
+        pod_tool.discardAllChange(config.kRepositoryName())
+        # 清理缓存
+        pod_tool.cleanProject(config.kRepositoryName(), config.kTargetName())
+
     # 切换网络环境
     print_split.print_log('2.切换网络环境')
     code_update.safe_change_code_config_network(netType, config_kConfigFilePath, config_kNetStatusForDevCode, config_kNetStatusForDisCode)
@@ -151,14 +173,6 @@ def archive_ever_input(rinpts):
         return
     # 即将打包提示
     begin_tip(rinpts)
-    # 非调试模式时
-    if config.ExportOnly==False:
-        # 下载代码
-        pod_tool.git_clone_repository(config.kRepositoryGit())
-        # 更新代码
-        pod_tool.updateCode(config.kRepositoryName(), config.kBranchName())
-        # 下载Podfile中的代码
-        pod_tool.installPods(config.kRepositoryName())
     # 获取输入信息
     for s in rinpts:
         selectType = s
@@ -166,11 +180,6 @@ def archive_ever_input(rinpts):
         if len(selectType) >= 3:
             selectType = s[:1]
             cmdType = s[2:]
-        if config.ExportOnly==False:
-            # 恢复变化
-            pod_tool.discardAllChange(config.kRepositoryName())
-            # 清理缓存
-            pod_tool.cleanProject(config.kRepositoryName(), config.kTargetName())
         # 进入打包流程
         main_archive(int(selectType), cmdType)
 

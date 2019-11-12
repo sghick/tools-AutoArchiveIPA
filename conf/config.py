@@ -103,6 +103,13 @@ def kTargetName():
     return ConfigInfos[CurrentConfigIndex]['kTargetName']
 
 ### 自动修改代码的文件,需要自定义 ###
+# Podfile中debug模式的切换
+def kPodFilePath():
+    return kRepositoryName() + 'Podfile'
+def kPodfileForReleasemode():
+    return 'DebugBranch = DebugBranchReleaseMode'
+def kPodfileForDebugmode():
+    return 'DebugBranch = DebugBranchDebugMode'
 # 主工程中用于切换代码的文件,可注释
 def kConfigFilePath():
     return kRepositoryName() + kTargetName() + '/Support/Configs/' + 'Config.h'
