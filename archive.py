@@ -56,6 +56,8 @@ def main_archive(selectType, cmdType):
 
     # 非调试模式时
     if config.ExportOnly==False:
+        # 恢复变化
+        pod_tool.discardAllChange(config.kRepositoryName())
         # 下载代码
         pod_tool.git_clone_repository(config.kRepositoryGit())
         # 更新代码
@@ -64,10 +66,6 @@ def main_archive(selectType, cmdType):
         code_update.safe_change_podfile_debugmark(selectType, config_kPodFilePath, config_kPodfileForDebugmode, config_kPodfileForReleasemode)
         # 下载Podfile中的代码
         pod_tool.installPods(config.kRepositoryName())
-
-    if config.ExportOnly==False:
-        # 恢复变化
-        pod_tool.discardAllChange(config.kRepositoryName())
         # 清理缓存
         pod_tool.cleanProject(config.kRepositoryName(), config.kTargetName())
 
