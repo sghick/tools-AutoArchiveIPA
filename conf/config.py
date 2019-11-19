@@ -18,6 +18,8 @@ ConfigInfo_TestDemo = {
     'kWorkspaceName':'TestDemo.xcworkspace',
     # Target名称
     'kTargetName': 'TestDemo',
+    # AppIcon名称(默认:AppIcon)
+    'kAppIconName': 'AppIcon',
 }
 
 ConfigInfo_TestDemo2 = {
@@ -32,6 +34,8 @@ ConfigInfo_TestDemo2 = {
     'kWorkspaceName':'TestDemo2.xcworkspace',
     # Target名称
     'kTargetName': 'TestDemo2',
+    # AppIcon名称(默认:AppIcon)
+    'kAppIconName': 'AppIcon',
 }
 
 ####################################################################################################
@@ -101,7 +105,9 @@ def kWorkspaceName():
     return ConfigInfos[CurrentConfigIndex]['kWorkspaceName']
 def kTargetName():
     return ConfigInfos[CurrentConfigIndex]['kTargetName']
-
+def kAppIconName():
+    return ConfigInfos[CurrentConfigIndex]['kAppIconName']
+    
 ### 自动修改代码的文件,需要自定义 ###
 # Podfile中debug模式的切换
 def kPodFilePath():

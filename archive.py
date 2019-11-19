@@ -22,6 +22,7 @@ def main_archive(selectType, cmdType):
     config_kBranchName = config.kBranchName()
     config_kWorkspaceName = config.kWorkspaceName()
     config_kTargetName = config.kTargetName()
+    config_kAppIconName = config.kAppIconName()
 
     config_kPodFilePath = config.kPodFilePath()
     config_kPodfileForDebugmode = config.kPodfileForDebugmode()
@@ -84,7 +85,7 @@ def main_archive(selectType, cmdType):
             print_split.print_war('打包失败')
             return
     # 读入info配置
-    version, build, bundleid, iconpath = xc_tool.readipainfo(xcarchivePath, config_kTargetName)
+    version, build, bundleid, iconpath = xc_tool.readipainfo(xcarchivePath, config_kTargetName, config_kAppIconName)
     # 导出ipa文件,返回ipa文件名(不带扩展名)
     print_split.print_log('5.导出ipa文件')
     exprotFileName, folderPath = xc_tool.exportipa(config_kRepositoryName, xcarchivePath, config_kTargetName, packageType, netType, build)

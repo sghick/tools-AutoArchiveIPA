@@ -2,6 +2,7 @@
 
 import os
 import time
+import re
 from utils import file_option
 from utils import settings
 from utils import alert
@@ -26,13 +27,18 @@ def archive(repositoryName, workspaceName, xcarchivePath, targetName) :
     return True
 
 # 读入info配置
-def readipainfo(exportPath, targetName):
+def readipainfo(exportPath, targetName, appIconName):
     infoplistpath = exportPath + targetName + '.xcarchive/Info.plist'
-    iconpath = targetName + '.xcarchive/Products/' + file_option.getApplicationPath(infoplistpath) + '/AppIcon60x60@3x.png'
+    icondoc = targetName + '.xcarchive/Products/' + file_option.getApplicationPath(infoplistpath) + '/'
+    iconpath = readipaiconinfo(icondoc, appIconName)
     version = file_option.getShortVersion(infoplistpath)
     build = file_option.getVersion(infoplistpath)
     bundleid = file_option.getBundleID(infoplistpath)
     return version, build, bundleid, iconpath
+
+def readipaiconinfo(icondoc, appIconName):
+    iconpath = icondoc + appIconName + '60x60@3x.png'
+    return iconpath
 
 def exportipa(repositoryName, exportPath, targetName, packageType, netType, v):
     curTime = time.strftime("%Y-%m-%d %H-%M-%S", time.localtime())
