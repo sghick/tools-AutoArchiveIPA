@@ -16,7 +16,7 @@ def get_cert(bundle_id, api_token):
     data = {'type': 'ios', 'bundle_id': bundle_id,
             'api_token': api_token}
     print(data)
-    req = requests.post(url='http://api.fir.im/apps', data=data)
+    req = requests.post(url='http://api.bq04.com/apps', data=data)
     cert_resp = req.content
     print_split.print_log('获取到 fir 响应')
     print(str(cert_resp))
