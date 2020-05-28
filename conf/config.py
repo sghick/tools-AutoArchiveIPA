@@ -88,7 +88,7 @@ ConfigInfos = [ConfigInfo_TestDemo, ConfigInfo_TestDemo2]
 ExportOnly = False   # True, False
 
 ####################################################################################################
-# 共通方法(以下方法无需要修改)
+# 共通方法
 ####################################################################################################
 
 def ConfDocs():
@@ -107,7 +107,7 @@ def kTargetName():
     return ConfigInfos[CurrentConfigIndex]['kTargetName']
 def kAppIconName():
     return ConfigInfos[CurrentConfigIndex]['kAppIconName']
-    
+
 ### 自动修改代码的文件,需要自定义 ###
 # Podfile中debug模式的切换
 def kPodFilePath():
@@ -119,10 +119,12 @@ def kPodfileForDebugmode():
 # 主工程中用于切换代码的文件,可注释
 def kConfigFilePath():
     return kRepositoryName() + kTargetName() + '/Support/Configs/' + 'Config.h'
+def kNetStatusForRCCode():
+    return 'static NSInteger const APP_MODE_RELEASE = (2);'
 def kNetStatusForDisCode():
-    return 'static BOOL const APP_MODE_RELEASE = (1);'
+    return 'static NSInteger const APP_MODE_RELEASE = (1);'
 def kNetStatusForDevCode():
-    return 'static BOOL const APP_MODE_RELEASE = (0);'
+    return 'static NSInteger const APP_MODE_RELEASE = (0);'
 ### 备份(SMB) ###
 def copy_ipa_to_smb():
     return ConfigInfo_General['copy_ipa_to_smb']

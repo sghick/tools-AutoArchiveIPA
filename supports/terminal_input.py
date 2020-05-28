@@ -17,6 +17,7 @@ def receive_input(branch, target, confDocs) :
     print('|' + parser_net_name(1) + '请输: 1')
     print('|' + parser_net_name(2) + '请输: 2')
     print('|' + parser_net_name(3) + '请输: 3')
+    print('|' + parser_net_name(4) + '请输: 4')
     print(sep_line_str)
     print('|打多个包时以空格隔开即可')
     print('|如需自动上传至fir/itc,请在每个数字后加 -a')
@@ -40,6 +41,9 @@ def parser_select_type(selectType) :
         packageType = 1
         netType = 2
     elif selectType == 3:
+        packageType = 1
+        netType = 3
+    elif selectType == 4:
         packageType = 2
         netType = 2
     return packageType, netType
@@ -52,6 +56,8 @@ def parser_xcarchive_path(repositoryName, packageType, netType) :
             xcarchivePath = settings.export_path_dev_inner(repositoryName)
         elif netType == 2:
             xcarchivePath = settings.export_path_dev_outer(repositoryName)
+        elif netType == 3:
+            xcarchivePath = settings.export_path_dev_rc(repositoryName)
     elif packageType == 2:
         xcarchivePath = settings.export_path_app_store(repositoryName)
     return xcarchivePath
@@ -63,5 +69,7 @@ def parser_net_name(selectType):
     elif selectType == 2:
         netname = 'Dev包外网环境'
     elif selectType == 3:
+        netname = 'Dev包RC环境'
+    elif selectType == 4:
         netname = 'AppStore包'
     return netname

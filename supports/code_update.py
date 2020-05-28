@@ -65,7 +65,7 @@ def change_conf_python3(idx, lenconfig):
 # 更改代码配置
 ####################################################################################################
 
-def safe_change_code_config_network(netType, configFilePath, netStatusForDevCode, netStatusForDisCode) :
+def safe_change_code_config_network(netType, configFilePath, netStatusForDevCode, netStatusForDisCode, netStatusForRCCode) :
     filePath = None
     try:
         filePath = settings.kAutoArchiveRepositoryRootPath + configFilePath
@@ -74,12 +74,12 @@ def safe_change_code_config_network(netType, configFilePath, netStatusForDevCode
         print("未定义代码配置文件!")
 
     if filePath:
-        change_code_config_network(netType, filePath, netStatusForDevCode, netStatusForDisCode)
+        change_code_config_network(netType, filePath, netStatusForDevCode, netStatusForDisCode, netStatusForRCCode)
 
 # 切换代码中配置文件的网络环境配置
-# netType:  1:内网,2:外网
+# netType:  1:内网,2:外网,3:RC
 # fpath:    代码的配置文件路径
-def change_code_config_network(netType, fpath, netStatusForDevCode, netStatusForDisCode) :
+def change_code_config_network(netType, fpath, netStatusForDevCode, netStatusForDisCode, netStatusForRCCode) :
     # 获取代码配置文件内容
     text, fileReadErrorReason = file_option.read_file(fpath)
     # 检查操作代码配置文件是否失败
@@ -102,26 +102,41 @@ def change_code_config_network(netType, fpath, netStatusForDevCode, netStatusFor
             codeNetType = 2
             codeNetLine = line
             break
+        elif netStatusForRCCode==line:
+            codeNetType = 3
+            codeNetLine = line
+            break
 
     if not codeNetLine:
         print('未找到网络设置相关')
         print(sep_line_str + '\n\n')
         return
 
+    if codeNetType == 1:
+        print('当前环境：内网')
+    elif codeNetType == 2:
+        print('当前环境：外网')
+    elif codeNetType == 3:
+        print('当前环境：RC')
+
+    if netType == codeNetType:
+        print('无需更换网络环境代码')
+        return
+
+    toReplaceCode = None
+    netName = None
     if netType == 1:
-        if codeNetType == 1:
-            print('当前环境：内网')
-        else:
-            print('当前环境：外网')
-            text = text.replace(codeNetLine, netStatusForDevCode)
-            print('已经将环境改为了内网')
+        netName = '内网'
+        toReplaceCode = netStatusForDevCode
     elif netType == 2:
-        if codeNetType == 1:
-            print('当前环境：内网')
-            text = text.replace(codeNetLine, netStatusForDisCode)
-            print('已经将环境改为了外网')
-        else:
-            print('当前环境：外网')
+        netName = '外网'
+        toReplaceCode = netStatusForDisCode
+    elif netType == 3:
+        netName = 'RC'
+        toReplaceCode = netStatusForRCCode
+    text = text.replace(codeNetLine, toReplaceCode)
+    print('已经将网络环境改为了' + netName)
+
     print(sep_line_str + '\n\n')
     # 写入代码配置文件内容
     fileWriteErrorReason = file_option.write_file(fpath, text)
@@ -144,12 +159,12 @@ def safe_change_podfile_debugmark(selectType, configFilePath, podfileForDebugmod
         change_podfile_debugmark(selectType, filePath, podfileForDebugmode, podfileForReleasemode)
 
 # 切换代码中Podefile文件中的DebugMode配置
-# selectType:  1,2:debugmode 3:releasemode 
+# selectType:  1,2,3:debugmode 3:releasemode 
 # fpath:    代码的配置文件路径
 def change_podfile_debugmark(selectType, fpath, podfileForDebugmode, podfileForReleasemode) :
     # 0:release 1:debug
     podDebugmode = 0
-    if selectType < 3:
+    if selectType < 4:
         podDebugmode = 1
     # 获取代码配置文件内容
     text, fileReadErrorReason = file_option.read_file(fpath)

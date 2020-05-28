@@ -29,6 +29,7 @@ def main_archive(selectType, cmdType):
     config_kPodfileForReleasemode = config.kPodfileForReleasemode()
     
     config_kConfigFilePath = config.kConfigFilePath()
+    config_kNetStatusForRCCode = config.kNetStatusForRCCode()
     config_kNetStatusForDisCode = config.kNetStatusForDisCode()
     config_kNetStatusForDevCode = config.kNetStatusForDevCode()
     
@@ -72,7 +73,7 @@ def main_archive(selectType, cmdType):
 
     # 切换网络环境
     print_split.print_log('2.切换网络环境')
-    code_update.safe_change_code_config_network(netType, config_kConfigFilePath, config_kNetStatusForDevCode, config_kNetStatusForDisCode)
+    code_update.safe_change_code_config_network(netType, config_kConfigFilePath, config_kNetStatusForDevCode, config_kNetStatusForDisCode, config_kNetStatusForRCCode)
     # 解析打包的输出路径
     print_split.print_log('3.解析打包的输出路径')
     xcarchivePath = terminal_input.parser_xcarchive_path(config_kRepositoryName, packageType, netType)
@@ -153,10 +154,10 @@ def valid_inputs(rinpts):
 
     for s in rinpts:
         selectType = s
-        if len(selectType) >= 3:
+        if len(selectType) >= 4:
             selectType = s[:1]
         try:
-            if int(selectType) > 3:
+            if int(selectType) > 4:
                 return False
         except:
             return False

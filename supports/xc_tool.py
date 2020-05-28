@@ -13,7 +13,7 @@ from utils import alert
 
 # archive并导出ipa
 # packageType:  1:Dev包, 2:AppStore包
-# netType:      1:内网环境 2:外网环境
+# netType:      1:内网环境 2:外网环境 3:RC环境
 def archive(repositoryName, workspaceName, xcarchivePath, targetName) :
     xcarchiveFilePath = '%s%s.xcarchive' % (xcarchivePath, targetName)
     archiveCommand = "xcodebuild archive -workspace '%s' -scheme '%s' -archivePath '%s'" % (workspaceName, targetName, xcarchiveFilePath)

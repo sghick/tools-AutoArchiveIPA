@@ -33,3 +33,5 @@ def export_path_dev_inner(repositoryName):
 def export_path_dev_outer(repositoryName):
     return kAutoArchiveExportRootPath + repositoryName + 'DevOuter/'
 
+def export_path_dev_rc(repositoryName):
+    return kAutoArchiveExportRootPath + repositoryName + 'DevRC/'
