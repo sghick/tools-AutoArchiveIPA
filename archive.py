@@ -154,7 +154,7 @@ def valid_inputs(rinpts):
 
     for s in rinpts:
         selectType = s
-        if len(selectType) >= 4:
+        if len(selectType) >= 3:
             selectType = s[:1]
         try:
             if int(selectType) > 4:
