@@ -73,8 +73,8 @@ def upload_ipa(fir_token, ipa_path, iconpath, bundle_id, netType, version, build
     cert_json = json.loads(cert_resp2)
     binary_dirt = cert_json['cert']['binary']
     icon_dirt = cert_json['cert']['icon']
-    downloadurl = 'https://fir.im/' + cert_json['short']
-    operalurl = 'https://fir.im/apps/' + cert_json['id']
+    downloadurl = 'https://www.betaqr.com/' + cert_json['short']
+    operalurl = 'https://www.betaqr.com/apps/' + cert_json['id']
     upload_icon(icon_dirt, iconpath)
     upload_fir(binary_dirt, ipa_path, version, build, changelog)
     return downloadurl, operalurl
