@@ -65,15 +65,19 @@ def upload_ipa(fir_token, ipa_path, iconpath, bundle_id, netType, version, build
     changelog = ''
     if netType == 1:
         changelog = '[测试环境](脚本自动上传,请添加更新说明)'
-    else:
+    elif netType == 2:
         changelog = '[线上环境](脚本自动上传,请添加更新说明)'
+    elif netType == 3:
+        changelog = '[RC环境](脚本自动上传,请添加更新说明)'
+    else:
+        changelog = '(脚本自动上传,请添加更新说明)'
 
     cert_resp2 = get_cert(bundle_id, fir_token)
     # 拿到cert实体
     cert_json = json.loads(cert_resp2)
     binary_dirt = cert_json['cert']['binary']
     icon_dirt = cert_json['cert']['icon']
-    downloadurl = 'https://www.betaqr.com/' + cert_json['short']
+    downloadurl = 'http://d.firim.info/' + cert_json['short']
     operalurl = 'https://www.betaqr.com/apps/' + cert_json['id']
     upload_icon(icon_dirt, iconpath)
     upload_fir(binary_dirt, ipa_path, version, build, changelog)

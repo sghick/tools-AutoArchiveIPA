@@ -77,7 +77,7 @@ def safe_change_code_config_network(netType, configFilePath, netStatusForDevCode
         change_code_config_network(netType, filePath, netStatusForDevCode, netStatusForDisCode, netStatusForRCCode)
 
 # 切换代码中配置文件的网络环境配置
-# netType:  1:内网,2:外网,3:RC
+# netType:  1:内网,2:外网,3:ADHoc
 # fpath:    代码的配置文件路径
 def change_code_config_network(netType, fpath, netStatusForDevCode, netStatusForDisCode, netStatusForRCCode) :
     # 获取代码配置文件内容

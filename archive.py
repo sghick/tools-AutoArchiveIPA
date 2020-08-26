@@ -106,7 +106,7 @@ def main_archive(selectType, cmdType):
     # 自动上传/派包
     if cmdType == 'a':
         # 上传到ITC
-        if selectType == 3:
+        if selectType == 4:
             if config_copy_ipa_to_itc :
                 print_split.print_log('8.上传到ITC(appstore类型专属)')
                 auto_itc.uploaditc(localpath, config_itc_username, config_itc_password)
