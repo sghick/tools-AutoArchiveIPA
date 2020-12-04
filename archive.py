@@ -22,6 +22,7 @@ def main_archive(selectType, cmdType):
     config_kBranchName = config.kBranchName()
     config_kWorkspaceName = config.kWorkspaceName()
     config_kTargetName = config.kTargetName()
+    config_kExportOptionName = config.kExportOptionName()
     config_kAppIconName = config.kAppIconName()
 
     config_kPodFilePath = config.kPodFilePath()
@@ -89,7 +90,7 @@ def main_archive(selectType, cmdType):
     version, build, bundleid, iconpath = xc_tool.readipainfo(xcarchivePath, config_kTargetName, config_kAppIconName)
     # 导出ipa文件,返回ipa文件名(不带扩展名)
     print_split.print_log('5.导出ipa文件')
-    exprotFileName, folderPath = xc_tool.exportipa(config_kRepositoryName, xcarchivePath, config_kTargetName, packageType, netType, build)
+    exprotFileName, folderPath = xc_tool.exportipa(config_kRepositoryName, xcarchivePath, config_kTargetName, config_kExportOptionName, packageType, netType, build)
     # 导出dSYM文件
     print_split.print_log('6.导出dSYM文件')
     xc_tool.exportdSYMFile(exprotFileName, folderPath, config_kTargetName)

@@ -40,7 +40,7 @@ def readipaiconinfo(icondoc, appIconName):
     iconpath = icondoc + appIconName + '60x60@3x.png'
     return iconpath
 
-def exportipa(repositoryName, exportPath, targetName, packageType, netType, v):
+def exportipa(repositoryName, exportPath, targetName, exportOptionName, packageType, netType, v):
     curTime = time.strftime("%Y-%m-%d %H-%M-%S", time.localtime())
     folderName = '%s %s' % (targetName, curTime)
     folderPath = '%s%s/%s/' % (exportPath, v, folderName)
@@ -51,9 +51,9 @@ def exportipa(repositoryName, exportPath, targetName, packageType, netType, v):
     # ExportOptions-xxx.plist 文件
     exportOptionsFilePath = None
     if packageType == 1:
-        exportOptionsFilePath = settings.export_option_dev_path(targetName)
+        exportOptionsFilePath = settings.export_option_dev_path(exportOptionName)
     elif packageType == 2:
-        exportOptionsFilePath = settings.export_option_dis_path(targetName)
+        exportOptionsFilePath = settings.export_option_dis_path(exportOptionName)
     if not os.path.exists(exportOptionsFilePath) :
         alert.show_alert('导出 ipa 失败~\n缺少文件 ExportOptions.plist\n请仔细阅读使用说明!')
         return

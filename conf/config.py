@@ -18,6 +18,8 @@ ConfigInfo_TestDemo = {
     'kWorkspaceName':'TestDemo.xcworkspace',
     # Target名称
     'kTargetName': 'TestDemo',
+    # ExportOption文件名前缀
+    'kExportOptionName': 'TestDemo',
     # AppIcon名称(默认:AppIcon)
     'kAppIconName': 'AppIcon',
 }
@@ -34,6 +36,8 @@ ConfigInfo_TestDemo2 = {
     'kWorkspaceName':'TestDemo2.xcworkspace',
     # Target名称
     'kTargetName': 'TestDemo2',
+    # ExportOption文件名前缀
+    'kExportOptionName': 'TestDemo2',
     # AppIcon名称(默认:AppIcon)
     'kAppIconName': 'AppIcon',
 }
@@ -105,6 +109,8 @@ def kWorkspaceName():
     return ConfigInfos[CurrentConfigIndex]['kWorkspaceName']
 def kTargetName():
     return ConfigInfos[CurrentConfigIndex]['kTargetName']
+def kExportOptionName():
+    return ConfigInfos[CurrentConfigIndex]['kExportOptionName']
 def kAppIconName():
     return ConfigInfos[CurrentConfigIndex]['kAppIconName']
 
