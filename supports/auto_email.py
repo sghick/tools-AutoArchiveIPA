@@ -88,7 +88,7 @@ def send(se, sendername, to_list, cc_list, subject, content):
     # 内容
     se.content = '\n' + content
     # 附件
-    # se.doc = '填写一个文件路径'
+    # my.doc = '填写一个文件路径'
     se.send()
 
 if __name__ == '__main__':

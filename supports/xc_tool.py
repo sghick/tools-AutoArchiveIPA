@@ -62,10 +62,10 @@ def exportipa(repositoryName, exportPath, targetName, exportOptionName, packageT
     xcarchiveFilePath, folderPath, exportOptionsFilePath)
     print('exportArchiveCommand：' + exportArchiveCommand)
     os.system('%s' % settings.cmd_cd(repositoryName) + ';' + exportArchiveCommand)
-    ipaFilePath = folderPath + targetName + '.ipa'
+    ipaFilePath = folderPath + file_option.getFilePath(folderPath, '.ipa')
     # 检查导出 ipa 是否成功
     if os.path.exists(ipaFilePath) is False:
-        alert.show_alert('导出 ipa 失败！')
+        alert.show_alert('未到找 ipa 文件！')
         return
     # 把 ipa 包重新命名下
     nn = None

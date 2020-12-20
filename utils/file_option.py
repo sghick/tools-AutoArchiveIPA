@@ -76,10 +76,10 @@ def createFolderIfNeed(folderPath):
     os.system(cmd)
 
 ####################################################################################################
-# 从 info.plist 获取版本号
+# 从 xxx.plist 获取value
 ####################################################################################################
 
-def getVersionWithKey(key, fpath):
+def getValueWithKey(key, fpath):
     f = None
     # 文件内容
     text = None
@@ -111,13 +111,23 @@ def getVersionWithKey(key, fpath):
             f.close()
 
 def getShortVersion(fpath):
-    return getVersionWithKey('CFBundleShortVersionString', fpath)
+    return getValueWithKey('CFBundleShortVersionString', fpath)
 
 def getVersion(fpath):
-    return getVersionWithKey('CFBundleVersion', fpath)
+    return getValueWithKey('CFBundleVersion', fpath)
 
 def getBundleID(fpath):
-    return getVersionWithKey('CFBundleIdentifier', fpath)
+    return getValueWithKey('CFBundleIdentifier', fpath)
 
 def getApplicationPath(fpath):
-    return getVersionWithKey('ApplicationPath', fpath)
+    return getValueWithKey('ApplicationPath', fpath)
+
+####################################################################################################
+# 从 某文件夹里查找第一个类型为pattern的文件路径
+####################################################################################################
+
+def getFilePath(folderPath,pattern):
+    files = os.listdir(folderPath)
+    for i in files:
+        if i.endswith(pattern):
+            return i

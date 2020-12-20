@@ -16,74 +16,87 @@ from email.mime.multipart import MIMEMultipart
 def main_archive(selectType, cmdType):
     print(_cmd_string(selectType, cmdType))
     ### config
-    targetName = 'Runner'
-    xcarchivePath = ''
+    scheme = 'xiaomi'
+    workspace = 'xiaomi.xcworkspace'
+    inputDoc = './lite-release/'
+    outputDoc = '../xiaomi_output/'
+    appIconName = 'AppIcon60x60@3x'
     # 状态变量
     subject = ''
     content = ''
+    xcarchiveOutput = _xcarchive_output(selectType, outputDoc)
     # 打包归档
-    archiveSuccess = _archive(targetName)
+    archiveSuccess, xcarchiveFilePath = archive(workspace, scheme, xcarchiveOutput)
     # 如果打包失败,终止之后的操作
     if not archiveSuccess:
         content = 'archive faild ==> ' + _cmd_string(selectType, cmdType)
         subject = '打包失败'
     else:
         # 读入info配置
-        version, build, bundleId, iconPath = _readIpaInfo(xcarchivePath, targetName)
+        version, build, bundleId, iconFile = read_ipa_info(xcarchiveFilePath, appIconName)
+        print(version + '\n' + build + '\n' + bundleId + '\n' + iconFile)
         # 导出ipa文件
-        exprotFileName, folderPath = _exportIpa(xcarchivePath, targetName, selectType, version)
-        # 拼ipa文件路径
-        ipaPath = folderPath + exprotFileName + '.ipa'
-        # 导出dSYM文件
-        _exportdSYMFile(exprotFileName, folderPath, targetName)
-        # 自动上传/派包
-        if cmdType == 'a':
-            # 上传到ITC
-            if selectType == 4:
-                _uploadToAppStore(ipaPath)
-                content = content + '\n' + '======= 已经上传至ITC ======='
-                content = content + '\n' + '是否上传成功,请以苹果邮件和具体情况为准,成功后可进行testflight测试'
-            # 上传到FIR
+        exportOptionsFilePath = _xcexport_input(selectType, inputDoc, scheme)
+        exportSuccess, folderPath, exprotFileName, newXcarchiveFilePath = export_ipa(xcarchiveOutput, scheme, selectType, version, exportOptionsFilePath)
+        if not exportSuccess:
+            content = 'export faild ==> ' + _cmd_string(selectType, cmdType)
+            subject = '导出失败'
+        else:
+            # 拼ipa文件路径
+            ipaPath = folderPath + exprotFileName + '.ipa'
+            # 导出dSYM文件
+            export_dSYM_file(folderPath, exprotFileName, scheme)
+            # 成功才会往下走,失败则抛出异常
+            content = content + '\n' + '======= 打包成功 ======='
+            content = content + '\n' + 'ipaPath:%s' % ipaPath
+            subject = '打包成功'
+            print(content)
+            # 自动上传/派包
+            if cmdType == 'a':
+                # 上传到ITC
+                if selectType == 4:
+                    _uploadToAppStore(ipaPath)
+                    content = content + '\n' + '======= 已经上传至ITC ======='
+                    content = content + '\n' + '是否上传成功,请以苹果邮件和具体情况为准,成功后可进行testflight测试'
+                # 上传到FIR
+                else:
+                    iconPath = newXcarchiveFilePath + iconFile
+                    downloadurl, operalurl = _uploadToFir(selectType, ipaPath, iconPath, bundleId, version, build)
+                    content = content + '\n' + '======= 上传FIR成功 ======='
+                    content = content + '\n' + '请扫码下载:'
+                    content = content + '\n' + '操作地址:\n  ' + operalurl
+                    content = content + '\n' + '下载地址:\n  ' + downloadurl
             else:
-                downloadurl, operalurl = _uploadToFir(selectType, ipaPath, folderPath + iconPath, bundleId, version, build)
-                content = content + '\n' + '======= 上传FIR成功 ======='
-                content = content + '\n' + '请扫码下载:'
-                content = content + '\n' + '操作地址:\n  ' + operalurl
-                content = content + '\n' + '下载地址:\n  ' + downloadurl
-            _sendEmail(selectType, subject, content)
+                content = content + '\n' + '======= 未选择自动上传 ======='
+                content = content + '\n' + '如需自动上传,请在加上命令参数 -a'
+    _sendEmail(selectType, subject, content)
     print(content)
 
-def _archive(targetName):
-    workspaceName = ''
-    xcarchivePath = ''
-    return archive(workspaceName, xcarchivePath, targetName)
-
-def _readIpaInfo(exportPath, targetName):
-    appIconName = 'AppIcon60x60@3x'
-    return read_ipa_info(exportPath, targetName, appIconName)
-
-def _exportIpa(exportPath, targetName, selectType, version):
-    exportOptionsFilePath = ''
-    netType = 1
-    packageType = 1
+# 根据输入类型和配置信息,返回xc打包路径
+def _xcarchive_output(selectType, root):
+    ### config
     if selectType == 1:
-        netType = 1
-        packageType = 1
+        return '%sDevInner/' % root
     elif selectType == 2:
-        netType = 2
-        packageType = 1
+        return '%sDevOuter/' % root
     elif selectType == 3:
-        netType = 2
-        packageType = 1
+        return '%sDevRC/' % root
     elif selectType == 4:
-        netType = 2
-        packageType = 2
+        return '%sDevAppStore/' % root
+    return ''
 
-    exprotFileName, folderPath = export_ipa(exportPath, targetName, exportOptionsFilePath, packageType, netType, version)
-    return exprotFileName, folderPath
-
-def _exportdSYMFile(exprotFileName, folderPath, targetName):
-    return export_dSYM_file(exprotFileName, folderPath, targetName)
+def _xcexport_input(selectType, root, scheme):
+    ### config
+    filename = 'ExportOptions.plist'
+    if selectType == 1:
+        return '%s%s-Dev-%s' % (root, scheme, filename)
+    elif selectType == 2:
+        return '%s%s-Dev-%s' % (root, scheme, filename)
+    elif selectType == 3:
+        return '%s%s-Dev-%s' % (root, scheme, filename)
+    elif selectType == 4:
+        return '%s%s-Dis-%s' % (root, scheme, filename)
+    return ''
 
 def _uploadToAppStore(ipaPath):
     ### config
@@ -120,6 +133,19 @@ def _sendEmail(selectType, subject, content):
 # String
 ####################################################################################################
 
+def _parser_selectType(selectType):
+    nn = None
+    pn = None
+    if selectType == 1:
+        return '内网', 'Dev'
+    if selectType == 2:
+        return '外网', 'Dev'
+    if selectType == 3:
+        return 'RC', 'Dev'
+    if selectType == 4:
+        return '外网', 'Dis'
+    return nn, pn
+
 def _parser_net_name(selectType):
     netname = ''
     if selectType == 1:
@@ -152,32 +178,29 @@ def _cmd_string(selectType, cmdType):
 ####################################################################################################
 
 # archive并导出ipa
-def archive(workspaceName, xcarchivePath, targetName) :
-    xcarchiveFilePath = '%s%s.xcarchive' % (xcarchivePath, targetName)
-    archiveCommand = "xcodebuild archive -workspace '%s' -scheme '%s' -archivePath '%s'" % (workspaceName, targetName, xcarchiveFilePath)
+def archive(workspace, scheme, outputPath) :
+    xcarchiveFilePath = '%s%s.xcarchive' % (outputPath, scheme)
+    archiveCommand = "xcodebuild archive -workspace '%s' -scheme '%s' -archivePath '%s'" % (workspace, scheme, xcarchiveFilePath)
+    cdCommand = 'cd %s' % './'
     print('archiveCommand：' + archiveCommand)
-    os.system(archiveCommand)
+    os.system('%s' % cdCommand + ';' + archiveCommand)
 
     # 检查 archive 是否成功
     if os.path.exists(xcarchiveFilePath) is False:
-        return False
-    return True
+        print(xcarchiveFilePath)
+        return False, ''
+    return True, xcarchiveFilePath
 
 # 读入info配置
-def read_ipa_info(exportPath, targetName, appIconName):
-    infoplistpath = exportPath + targetName + '.xcarchive/Info.plist'
-    iconDoc = targetName + '.xcarchive/Products/' + getApplicationPath(infoplistpath) + '/'
-    iconPath = read_ipa_icon_info(iconDoc, appIconName)
+def read_ipa_info(xcarchiveFilePath, appIconName):
+    infoplistpath = xcarchiveFilePath + '/Info.plist'
+    iconFile = '/Products/%s/%s' % (getApplicationPath(infoplistpath), appIconName)
     version = getShortVersion(infoplistpath)
     build = getVersion(infoplistpath)
     bundleId = getBundleID(infoplistpath)
-    return version, build, bundleId, iconPath
+    return version, build, bundleId, iconFile
 
-def read_ipa_icon_info(iconDoc, appIconName):
-    iconPath = iconDoc + appIconName
-    return iconPath
-
-def export_ipa(exportPath, targetName, exportOptionsFilePath, packageType, netType, v):
+def export_ipa(exportPath, targetName, selectType, v, exportOptionsFilePath):
     curTime = time.strftime("%Y-%m-%d %H-%M-%S", time.localtime())
     folderName = '%s %s' % (targetName, curTime)
     folderPath = '%s%s/%s/' % (exportPath, v, folderName)
@@ -187,38 +210,29 @@ def export_ipa(exportPath, targetName, exportOptionsFilePath, packageType, netTy
     xcarchiveFilePath = exportPath + xcarchiveFileName
     # ExportOptions-xxx.plist 文件
     if not os.path.exists(exportOptionsFilePath) :
-        return
+        return False, '', '', ''
     # 导出ipa包
     exportArchiveCommand = "xcodebuild -exportArchive -archivePath '%s' -exportPath '%s' -exportOptionsPlist '%s'" % (
     xcarchiveFilePath, folderPath, exportOptionsFilePath)
     print('exportArchiveCommand：' + exportArchiveCommand)
     os.system(exportArchiveCommand)
-    ipaFilePath = folderPath + targetName + '.ipa'
+    ipaFilePath = folderPath + getFilePath(folderPath, '.ipa')
     # 检查导出 ipa 是否成功
     if os.path.exists(ipaFilePath) is False:
-        return
+        return False, '', '', ''
     # 把 ipa 包重新命名下
-    nn = None
-    if netType == 1:
-        nn = '内网'
-    else:
-        nn = '外网'
-    pn = None
-    if packageType == 1:
-        pn = 'Dev'
-    else:
-        pn = 'Dis'
+    nn, pn = _parser_selectType(selectType)
     exprotFileName = targetName + '-' + v + '-' + nn + '-' + pn
     newIpaFilePath = folderPath + '/' + exprotFileName + '.ipa'
     fileRename(ipaFilePath, newIpaFilePath)
     # 导出成功后再移动 .xcarchive 文件到新目录中
     newXcarchiveFilePath = folderPath + xcarchiveFileName
     moveFileToFolder(xcarchiveFilePath, newXcarchiveFilePath)
-    return exprotFileName, folderPath
+    return True, folderPath, exprotFileName, newXcarchiveFilePath
 
-def export_dSYM_file(exprotFileName, folderPath, targetName):
+def export_dSYM_file(folderPath, exprotFileName, scheme):
     # .dSYM 文件到新目录中
-    dSYMPath = folderPath + targetName + '.xcarchive/dSYMs/' + targetName.lower() + '.app.dSYM'
+    dSYMPath = folderPath + scheme + '.xcarchive/dSYMs/' + scheme.lower() + '.app.dSYM'
     dSYMToOutputPath = folderPath + exprotFileName + '.dSYM'
     print('dSYM:' + dSYMPath)
     print('dSYM out put:' + dSYMToOutputPath)
@@ -268,7 +282,6 @@ def write_file(fpath, text) :
             f.close()
     return fileWriteErrorReason
 
-
 ####################################################################################################
 # 文件&文件夹操作
 ####################################################################################################
@@ -296,6 +309,12 @@ def fileRename(oldFilePath, newFilePath):
 def createFolderIfNeed(folderPath):
     cmd = "mkdir -p '%s'" % folderPath
     os.system(cmd)
+
+def getFilePath(folderPath, pattern):
+    files = os.listdir(folderPath)
+    for i in files:
+        if i.endswith(pattern):
+            return i
 
 ####################################################################################################
 # 从 info.plist 获取版本号
