@@ -70,8 +70,9 @@ def main_archive(selectType, cmdType):
             else:
                 content = content + '\n' + '======= 未选择自动上传 ======='
                 content = content + '\n' + '如需自动上传,请在加上命令参数 -a'
-    _sendEmail(selectType, subject, content)
-    print(content)
+    if cmdType == 'a'
+        _sendEmail(selectType, subject, content)
+        print(content)
 
 # 根据输入类型和配置信息,返回xc打包路径
 def _xcarchive_output(selectType, root):
