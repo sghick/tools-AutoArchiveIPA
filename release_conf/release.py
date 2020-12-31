@@ -10,17 +10,18 @@ import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from release_conf import config
 
 # @params selectType 1:dev-test,2:dev-online,3:rc-online,4:AppStore-online
 # @params cmdType -a 自动上传至Fir/AppStore
 def main_archive(selectType, cmdType):
     print(_cmd_string(selectType, cmdType))
     ### config
-    scheme = 'xiaomi'
-    workspace = 'xiaomi.xcworkspace'
-    inputDoc = './lite-release/'
-    outputDoc = '../xiaomi_output/'
-    appIconName = 'AppIcon60x60@3x'
+    scheme = config.kScheme()
+    workspace = config.kWorkspace()
+    inputDoc = config.kInputDoc()
+    outputDoc = config.kOutputDoc()
+    appIconName = config.kAppIconName()
     # 状态变量
     subject = ''
     content = ''
@@ -99,28 +100,25 @@ def _xcexport_input(selectType, root, scheme):
     return ''
 
 def _uploadToAppStore(ipaPath):
-    ### config
-    itc_username = 'aaa@bbb.com',
-    itc_password = 'xxx',
+    itc_username = config.itc_username(),
+    itc_password = config.itc_password(),
     uploaditc(ipaPath, itc_username, itc_password)
 
 def _uploadToFir(selectType, ipaPath, iconPath, bundleId, version, build):
-    ### config
-    fir_token = 'xxx'
+    fir_token = config.fir_token()
     changelog = _fir_changelog(selectType)
     downloadurl, operalurl = upload_ipa(fir_token, ipaPath, iconPath, bundleId, version, build, changelog)
     return downloadurl, operalurl
 
 def _sendEmail(selectType, subject, content):
-    ### config
-    email_SMTP = 'smtp.exmail.qq.com',
-    email_SMTP_port = 465,
-    email_user = 'aaa@bbb.com',
-    email_password = 'xxx',
-    email_sender_name = 'iOS Team',
-    email_to_list = ['a001@bbb.com', 'a002@bbb.com'],
-    email_to_list_itc = ['a001@bbb.com'], # ITC上传时可以进行区别配置
-    email_cc_list = None,
+    email_SMTP = config.email_SMTP()
+    email_SMTP_port = config.email_SMTP_port()
+    email_user = config.email_user()
+    email_password = config.email_password()
+    email_sender_name = config.email_sender_name()
+    email_to_list = config.email_to_list()
+    email_to_list_itc = config.email_to_list_itc()
+    email_cc_list = config.email_cc_list()
     # 
     email_to_list = email_to_list if selectType != 4 else email_to_list_itc
     # 打包成功并拷贝到服务器后发送邮件
@@ -187,7 +185,6 @@ def archive(workspace, scheme, outputPath) :
 
     # 检查 archive 是否成功
     if os.path.exists(xcarchiveFilePath) is False:
-        print(xcarchiveFilePath)
         return False, ''
     return True, xcarchiveFilePath
 
@@ -219,6 +216,7 @@ def export_ipa(exportPath, targetName, selectType, v, exportOptionsFilePath):
     ipaFilePath = folderPath + getFilePath(folderPath, '.ipa')
     # 检查导出 ipa 是否成功
     if os.path.exists(ipaFilePath) is False:
+        print(ipaFilePath)
         return False, '', '', ''
     # 把 ipa 包重新命名下
     nn, pn = _parser_selectType(selectType)
@@ -281,6 +279,7 @@ def write_file(fpath, text) :
         if f:
             f.close()
     return fileWriteErrorReason
+
 
 ####################################################################################################
 # 文件&文件夹操作
@@ -541,17 +540,90 @@ def email_send(se, sendername, to_list, cc_list, subject, content):
     se.send()
 
 ####################################################################################################
+# for flutter
+####################################################################################################
+
+def change_flutter_code(selectType, isflutter):
+    ### config
+    code_path = config.code_path()
+    dev_code = config.dev_code()
+    release_code = config.release_code()
+
+    if isflutter:
+        # 切换环境代码
+        text, fileReadErrorReason = read_file(code_path)
+        # 检查操作代码配置文件是否失败
+        if text is None:
+            print(fileReadErrorReason)
+            return False
+        success, newText = replace_flutter_code(text, selectType, dev_code, release_code)
+        if success == False:
+            print('替换flutter网络环境代码失败:selectType:' + str(selectType))
+            return False
+         # 写入代码配置文件内容
+        fileWriteErrorReason = write_file(code_path, newText)
+        # 检查操作失败,弹窗提示
+        if fileWriteErrorReason is not None :
+            print(fileWriteErrorReason)
+            return False
+        else :
+            return True
+    return True
+
+def replace_flutter_code(text, selectType, devCode, releaseCode):
+    replaceCode = replace_code(selectType, devCode, releaseCode)
+    tl = text.split('\n')
+    currentCode = ''
+    for line in tl:
+        print(line)
+        if devCode==line:
+            currentCode = line
+            break
+        elif releaseCode==line:
+            currentCode = line
+            break
+    if currentCode == '':
+        print('未找到配置文件')
+        return False, text
+    if currentCode == replaceCode:
+        print('当前环境配置无需切换:%s' % currentCode)
+    else:
+        print('当前环境配置:%s, 需要切换至:%s' % (currentCode, replaceCode))
+        text = text.replace(currentCode, replaceCode)
+    return True, text
+    
+def replace_code(selectType, devCode, releaseCode):
+    if selectType == 2:
+        return releaseCode
+    elif selectType == 3:
+        return releaseCode
+    elif selectType == 4:
+        return releaseCode
+    return devCode
+
+####################################################################################################
 # __main__
 ####################################################################################################
 def _archive_ever_input(rinpts):
-    for s in rinpts:
+    isflutter = False
+    finputs = rinpts
+    if len(rinpts) > 0:
+        if rinpts[0] == 'flutter':
+            isflutter = True
+            finputs = rinpts[1:]
+    for s in finputs:
         selectType = s
         cmdType = ''
         if len(selectType) >= 3:
             selectType = s[:1]
             cmdType = s[2:]
-        # 进入打包流程
-        main_archive(int(selectType), cmdType)
+        # flutter打包模式切换环境
+        if change_flutter_code(int(selectType), isflutter):
+            if isflutter:
+                # build ios
+                os.system('flutter build ios')
+            # 进入打包流程
+            main_archive(int(selectType), cmdType)
 
 if __name__ == '__main__':
     args = sys.argv
@@ -563,6 +635,7 @@ if __name__ == '__main__':
         print('|' + _parser_net_name(3) + '请输: 3')
         print('|' + _parser_net_name(4) + '请输: 4')
         print('+----------------------------+')
+        print('|打flutter项目的包请在数字前增加flutter标识,如flutter 1-a')
         print('|打多个包时以空格隔开即可')
         print('|如需自动上传至fir/itc,请在每个数字后加 -a')
         print('+----------------------------+')
