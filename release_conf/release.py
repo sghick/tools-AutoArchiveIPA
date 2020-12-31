@@ -72,7 +72,7 @@ def main_archive(selectType, cmdType):
                 content = content + '\n' + '如需自动上传,请在加上命令参数 -a'
     if cmdType == 'a':
         _sendEmail(selectType, subject, content)
-        print(content)
+    print(content)
 
 # 根据输入类型和配置信息,返回xc打包路径
 def _xcarchive_output(selectType, root):
@@ -84,7 +84,7 @@ def _xcarchive_output(selectType, root):
     elif selectType == 3:
         return '%sDevRC/' % root
     elif selectType == 4:
-        return '%sDevAppStore/' % root
+        return '%sAppStore/' % root
     return ''
 
 def _xcexport_input(selectType, root, scheme):

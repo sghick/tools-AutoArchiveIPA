@@ -1,6 +1,5 @@
 ## 带-a参数将自动上传至fir或者itc(4-a)
 git pull
-pod install
 # 测试环境dev包
 python3 release.py flutter 1-a
 # 正式环境dev包
