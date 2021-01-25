@@ -101,8 +101,8 @@ def _xcexport_input(selectType, root, scheme):
     return ''
 
 def _uploadToAppStore(ipaPath):
-    itc_username = config.itc_username(),
-    itc_password = config.itc_password(),
+    itc_username = config.itc_username()
+    itc_password = config.itc_password()
     uploaditc(ipaPath, itc_username, itc_password)
 
 def _uploadToFir(selectType, ipaPath, iconPath, bundleId, version, build):
