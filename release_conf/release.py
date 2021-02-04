@@ -16,12 +16,13 @@ from release_conf import config
 # @params cmdType -a 自动上传至Fir/AppStore
 def main_archive(selectType, cmdType):
     print(_cmd_string(selectType, cmdType))
+    conf = config.ConfigInfo().proItem
     ### config
-    scheme = config.kScheme()
-    workspace = config.kWorkspace()
-    inputDoc = config.kInputDoc()
-    outputDoc = config.kOutputDoc()
-    appIconName = config.kAppIconName()
+    scheme = conf.scheme
+    workspace = conf.workspace
+    inputDoc = conf.inputDoc
+    outputDoc = conf.outputDoc
+    appIconName = conf.appIconName
     # 状态变量
     subject = ''
     content = ''
@@ -101,25 +102,26 @@ def _xcexport_input(selectType, root, scheme):
     return ''
 
 def _uploadToAppStore(ipaPath):
-    itc_username = config.itc_username()
-    itc_password = config.itc_password()
-    uploaditc(ipaPath, itc_username, itc_password)
+    conf = config.ConfigInfo().itcItem
+    uploaditc(ipaPath, conf.username, conf.password)
 
 def _uploadToFir(selectType, ipaPath, iconPath, bundleId, version, build):
-    fir_token = config.fir_token()
+    conf = config.ConfigInfo().firItem
+    fir_token = conf.token
     changelog = _fir_changelog(selectType)
     downloadurl, operalurl = upload_ipa(fir_token, ipaPath, iconPath, bundleId, version, build, changelog)
     return downloadurl, operalurl
 
 def _sendEmail(selectType, subject, content):
-    email_SMTP = config.email_SMTP()
-    email_SMTP_port = config.email_SMTP_port()
-    email_user = config.email_user()
-    email_password = config.email_password()
-    email_sender_name = config.email_sender_name()
-    email_to_list = config.email_to_list()
-    email_to_list_itc = config.email_to_list_itc()
-    email_cc_list = config.email_cc_list()
+    conf = config.ConfigInfo().emailItem
+    email_SMTP = conf.smtp
+    email_SMTP_port = conf.port
+    email_user = conf.user
+    email_password = conf.password
+    email_sender_name = conf.sendername
+    email_to_list = conf.tolist
+    email_to_list_itc = conf.toitclist
+    email_cc_list = conf.cclist
     # 
     email_to_list = email_to_list if selectType != 4 else email_to_list_itc
     # 打包成功并拷贝到服务器后发送邮件
@@ -541,35 +543,45 @@ def email_send(se, sendername, to_list, cc_list, subject, content):
     se.send()
 
 ####################################################################################################
-# for flutter
+# for code change
 ####################################################################################################
 
 def change_flutter_code(selectType, isflutter):
-    ### config
-    code_path = config.code_path()
-    dev_code = config.dev_code()
-    release_code = config.release_code()
-
+    rtn = True
+    conf = config.ConfigInfo()
     if isflutter:
-        # 切换环境代码
-        text, fileReadErrorReason = read_file(code_path)
-        # 检查操作代码配置文件是否失败
-        if text is None:
-            print(fileReadErrorReason)
-            return False
-        success, newText = replace_flutter_code(text, selectType, dev_code, release_code)
-        if success == False:
-            print('替换flutter网络环境代码失败:selectType:' + str(selectType))
-            return False
-         # 写入代码配置文件内容
-        fileWriteErrorReason = write_file(code_path, newText)
-        # 检查操作失败,弹窗提示
-        if fileWriteErrorReason is not None :
-            print(fileWriteErrorReason)
-            return False
-        else :
-            return True
-    return True
+        rtn = replaceCode(selectType, conf.flutterCode)
+    replaceCode(selectType, conf.ocCode)
+    return rtn
+
+####################################################################################################
+# for file replace
+####################################################################################################   
+
+def replaceCode(selectType, codeItem):
+    ### config
+    code_path = codeItem.path
+    dev_code = codeItem.dev
+    release_code = codeItem.release
+
+    # 切换环境代码
+    text, fileReadErrorReason = read_file(code_path)
+    # 检查操作代码配置文件是否失败
+    if text is None:
+        print(fileReadErrorReason)
+        return False
+    success, newText = replace_flutter_code(text, selectType, dev_code, release_code)
+    if success == False:
+        print('替换flutter网络环境代码失败:selectType:' + str(selectType))
+        return False
+        # 写入代码配置文件内容
+    fileWriteErrorReason = write_file(code_path, newText)
+    # 检查操作失败,弹窗提示
+    if fileWriteErrorReason is not None :
+        print(fileWriteErrorReason)
+        return False
+    else :
+        return True
 
 def replace_flutter_code(text, selectType, devCode, releaseCode):
     replaceCode = replace_code(selectType, devCode, releaseCode)
