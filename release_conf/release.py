@@ -637,6 +637,10 @@ def _archive_ever_input(rinpts):
             if isflutter:
                 # build ios
                 os.system('flutter build ios')
+            else:
+                # 更新pod
+                os.system('git status')
+                os.system('pod install')
             # 进入打包流程
             main_archive(int(selectType), cmdType)
 
