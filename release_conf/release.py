@@ -623,7 +623,7 @@ def code_for_replace(selectType, devCode, releaseCode):
             
 def os_system(cmd, arch):
     if arch:
-        os.system('arch -x86_64' + cmd)
+        os.system('arch -x86_64 ' + cmd)
     else:
         os.system(cmd)
 

@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import platform
 from utils import settings
 
 ####################################################################################################
@@ -21,6 +22,7 @@ def receive_input(branch, target, confDocs) :
     print(sep_line_str)
     print('|打多个包时以空格隔开即可')
     print('|如需自动上传至fir/itc,请在每个数字后加 -a')
+    print('|您的CPU架构为:' + platform.machine())
     print(sep_line_str)
     print('|可切换至以下项目: ')
     for i in range(len(confDocs)) :

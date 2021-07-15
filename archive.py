@@ -124,7 +124,7 @@ def main_archive(selectType, cmdType):
                 status = status + '\n' + '下载地址:\n  ' + downloadurl
     # 结果
     if config_send_email :
-        email_to_list = config_email_to_list if selectType != 4 else config_email_to_list_itc
+        email_to_list = config_email_to_list if selectType != 3 else config_email_to_list_itc
         # 发邮件
         print_split.print_log('10.发邮件')
         # 打包成功并拷贝到服务器后发送邮件

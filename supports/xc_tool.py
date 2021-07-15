@@ -16,7 +16,7 @@ from utils import alert
 # netType:      1:内网环境 2:外网环境 3:RC环境
 def archive(repositoryName, workspaceName, xcarchivePath, targetName) :
     xcarchiveFilePath = '%s%s.xcarchive' % (xcarchivePath, targetName)
-    archiveCommand = "xcodebuild archive -workspace '%s' -scheme '%s' -archivePath '%s'" % (workspaceName, targetName, xcarchiveFilePath)
+    archiveCommand = "xcodebuild archive -quiet -destination 'generic/platform=iOS' -workspace '%s' -scheme '%s' -archivePath '%s'" % (workspaceName, targetName, xcarchiveFilePath)
     print('archiveCommand：' + archiveCommand)
     os.system('%s' % settings.cmd_cd(repositoryName) + ';' + archiveCommand)
 

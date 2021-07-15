@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import os
+import platform
 from utils import print_split
 from utils import settings
 
@@ -37,7 +38,7 @@ def updateCode(repositoryName, branchName):
 def installPods(repositoryName):
     print_split.print_log("installPods")
     # pod install --verbose --no-repo-update
-    os.system('%s' % settings.cmd_cd(repositoryName) + ';' + 'pod install')
+    os.system('%s' % settings.cmd_cd(repositoryName) + ';' + arch_cmd('pod install', isarm64()))
 
 def discardAllChange(repositoryName):
     print_split.print_log("discardAllChange")
@@ -47,3 +48,12 @@ def cleanProject(repositoryName, targetName):
     print_split.print_log("cleanProject")
     cleanCommand = "xcodebuild -target '%s' clean" % targetName
     os.system('%s' % settings.cmd_cd(repositoryName) + ';' + cleanCommand)
+
+def isarm64():
+    return 'arm64' == platform.machine()
+
+def arch_cmd(cmd, arch):
+    if arch:
+        return 'arch -x86_64 ' + cmd
+    else:
+        return cmd
