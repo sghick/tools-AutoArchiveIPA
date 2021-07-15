@@ -8,6 +8,7 @@ import requests
 import json
 import os
 import smtplib
+import platform
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from release_conf import config
@@ -122,12 +123,12 @@ def _sendEmail(selectType, subject, content):
     email_to_list = conf.tolist
     email_to_list_itc = conf.toitclist
     email_cc_list = conf.cclist
-    # 
+    #
     email_to_list = email_to_list if selectType != 4 else email_to_list_itc
     # 打包成功并拷贝到服务器后发送邮件
     se = email_create(email_SMTP, email_SMTP_port, email_user, email_password)
     email_subject = subject
-    email_content = content  
+    email_content = content
     email_send(se, email_sender_name, email_to_list, email_cc_list, email_subject, email_content)
 
 ####################################################################################################
@@ -558,7 +559,7 @@ def change_flutter_code(selectType, isflutter):
 
 ####################################################################################################
 # for file replace
-####################################################################################################   
+####################################################################################################
 
 def replaceCode(selectType, codeItem):
     ### config
@@ -617,15 +618,26 @@ def code_for_replace(selectType, devCode, releaseCode):
     return devCode
 
 ####################################################################################################
+# cmd
+####################################################################################################
+            
+def os_system(cmd, arch):
+    if arch:
+        os.system('arch -x86_64' + cmd)
+    else:
+        os.system(cmd)
+
+####################################################################################################
 # __main__
 ####################################################################################################
 def _archive_ever_input(rinpts):
+    isarm64 = 'arm64' == platform.machine()
     isflutter = False
     finputs = rinpts
     if len(rinpts) > 0:
-        if rinpts[0] == 'flutter':
+        if finputs[0] == 'flutter':
             isflutter = True
-            finputs = rinpts[1:]
+            finputs = finputs[1:]
     for s in finputs:
         selectType = s
         cmdType = ''
@@ -640,7 +652,7 @@ def _archive_ever_input(rinpts):
             else:
                 # 更新pod
                 os.system('git status')
-                os.system('pod install')
+                os_system('pod install', isarm64)
             # 进入打包流程
             main_archive(int(selectType), cmdType)
 
@@ -657,6 +669,7 @@ if __name__ == '__main__':
         print('|打flutter项目的包请在数字前增加flutter标识,如flutter 1-a')
         print('|打多个包时以空格隔开即可')
         print('|如需自动上传至fir/itc,请在每个数字后加 -a')
+        print('|您的CPU架构为:' + platform.machine())
         print('+----------------------------+')
         print('+----------------------------+')
         selectTypes = input('请输入: ')
