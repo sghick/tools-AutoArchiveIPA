@@ -181,7 +181,7 @@ def _cmd_string(selectType, cmdType):
 # archive并导出ipa
 def archive(workspace, scheme, outputPath) :
     xcarchiveFilePath = '%s%s.xcarchive' % (outputPath, scheme)
-    archiveCommand = "xcodebuild archive -workspace '%s' -scheme '%s' -archivePath '%s'" % (workspace, scheme, xcarchiveFilePath)
+    archiveCommand = "xcodebuild archive -destination 'generic/platform=iOS' -workspace '%s' -scheme '%s' -archivePath '%s' -quiet" % (workspace, scheme, xcarchiveFilePath)
     cdCommand = 'cd %s' % './'
     print('archiveCommand：' + archiveCommand)
     os.system('%s' % cdCommand + ';' + archiveCommand)
@@ -551,7 +551,9 @@ def change_flutter_code(selectType, isflutter):
     conf = config.ConfigInfo()
     if isflutter:
         rtn = replaceCode(selectType, conf.flutterCode)
-    replaceCode(selectType, conf.ocCode)
+    else:
+        rtn = replaceCode(selectType, conf.ocCode)
+    replaceCode(selectType, conf.podCode)
     return rtn
 
 ####################################################################################################
@@ -570,9 +572,9 @@ def replaceCode(selectType, codeItem):
     if text is None:
         print(fileReadErrorReason)
         return False
-    success, newText = replace_flutter_code(text, selectType, dev_code, release_code)
+    success, newText = replace_project_code(text, selectType, dev_code, release_code)
     if success == False:
-        print('替换flutter网络环境代码失败:selectType:' + str(selectType))
+        print('替换网络环境代码失败:selectType:' + str(selectType))
         return False
         # 写入代码配置文件内容
     fileWriteErrorReason = write_file(code_path, newText)
@@ -583,8 +585,8 @@ def replaceCode(selectType, codeItem):
     else :
         return True
 
-def replace_flutter_code(text, selectType, devCode, releaseCode):
-    replaceCode = replace_code(selectType, devCode, releaseCode)
+def replace_project_code(text, selectType, devCode, releaseCode):
+    replaceCode = code_for_replace(selectType, devCode, releaseCode)
     tl = text.split('\n')
     currentCode = ''
     for line in tl:
@@ -605,7 +607,7 @@ def replace_flutter_code(text, selectType, devCode, releaseCode):
         text = text.replace(currentCode, replaceCode)
     return True, text
     
-def replace_code(selectType, devCode, releaseCode):
+def code_for_replace(selectType, devCode, releaseCode):
     if selectType == 2:
         return releaseCode
     elif selectType == 3:

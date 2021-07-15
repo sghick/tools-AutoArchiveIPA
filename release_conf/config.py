@@ -11,7 +11,7 @@ class ProjectItem:
         # 打包配置输入文件夹(ExportOptions.plist文件)
         self.inputDoc = './release_conf/'
         # 打包输入文件夹
-        self.outputDoc = '../../release_xxx/'
+        self.outputDoc = '../../release/'
         # Icon名字
         self.appIconName = 'AppIcon60x60@3x.png'
 
@@ -50,9 +50,16 @@ class CodeItem:
 
     def ocCode(self):
         item = CodeItem()
+        item.path = './Runner/BDSSupport/Configs/BDSConfig.h'
+        item.release = 'static NSInteger const APP_MODE_RELEASE = (1);'
+        item.dev = 'static NSInteger const APP_MODE_RELEASE = (0);'
+        return item
+
+    def podCode(self):
+        item = CodeItem()
         item.path = './Podfile'
-        item.release = 'DebugMode = DebugBranchReleaseMode'
-        item.dev = 'DebugMode = DebugBranchDebugMode'
+        item.release = 'BDSDebugMode = BDSDebugBranchReleaseMode'
+        item.dev = 'BDSDebugMode = BDSDebugBranchDebugMode'
         return item
 
 class ConfigInfo:
@@ -63,6 +70,7 @@ class ConfigInfo:
         self.emailItem = EmailItem()
         self.flutterCode = CodeItem().flutterCode()
         self.ocCode = CodeItem().ocCode()
+        self.podCode = CodeItem().podCode()
 
 
 
